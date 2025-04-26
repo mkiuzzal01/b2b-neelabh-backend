@@ -20,6 +20,8 @@ const userSchema = new Schema<TUser>(
     status: {
       type: String,
       required: true,
+      enum: ['active', 'inactive', 'blocked'],
+      default: 'active',
     },
     password: {
       type: String,

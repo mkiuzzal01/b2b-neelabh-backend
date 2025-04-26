@@ -1,22 +1,22 @@
 import express, { Request, Response } from 'express';
 import cors from 'cors';
-// import router from './app/router';
+import router from './app/router';
 
 const app = express();
 app.use(express.json());
 app.use(cors({ origin: ['localhost:5173'] }));
 app.use(express.text());
 
+// All application routes:
+app.use('/api/v1/', router);
+
 // Home route:
 app.get('/', (req: Request, res: Response) => {
-  res.send('Welcome to Health Track');
+  res.send('Welcome to b2b neelabh');
 });
 
-// All application routes:
-// app.use('/api/v1/', router);
-
-// This is  just test:
-app.get('/', (req: Request, res: Response) => {
+// Test route:
+app.get('/test', (req: Request, res: Response) => {
   Promise.reject();
   res.send(req);
 });

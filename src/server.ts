@@ -7,7 +7,7 @@ let server: Server;
 async function main() {
   try {
     server = app.listen(config.port, () => {
-      console.log(`Example app listening on port ${config.port}`);
+      console.log(`the server listening on port ${config.port}`);
     });
     await mongoose.connect(config.database_url as string);
   } catch (error) {

@@ -1,3 +1,6 @@
-export type TRole = {
-  roles: 'superAdmin' | 'admin' | 'productManager' | 'accountant' | 'seller';
-};
+export type TRole =
+  | 'superAdmin'
+  | 'admin'
+  | 'productManager'
+  | 'accountant'
+  | 'seller';

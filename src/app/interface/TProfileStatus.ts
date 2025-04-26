@@ -1,3 +1,1 @@
-export type TProfileStatus = {
-  status: 'active' | 'inactive' | 'blocked';
-};
+export type TProfileStatus = 'active' | 'inactive' | 'blocked';

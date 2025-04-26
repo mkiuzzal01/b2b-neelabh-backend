@@ -1,11 +1,18 @@
+import { TProfileStatus } from '../../interface/TProfileStatus';
 import { TRole } from '../../interface/TRole';
 
 export type TUser = {
   userId: string;
   email: string;
   role: TRole;
-  status: string;
+  status: TProfileStatus;
   password: string;
-  isPasswordChanged: boolean;
-  isDeleted: boolean;
+  isPasswordChanged: {
+    type: boolean;
+    default: false;
+  };
+  isDeleted: {
+    type: boolean;
+    default: false;
+  };
 };
