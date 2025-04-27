@@ -17,3 +17,5 @@ router.get(
   '/get-single-stakeholder/:id',
   stakeholderController.getSingleStakeholder,
 );
+
+export const stakeholderRoute = router;

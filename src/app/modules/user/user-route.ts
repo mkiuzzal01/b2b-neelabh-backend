@@ -1,8 +1,8 @@
 import { Router } from 'express';
 import { userController } from './user-controller';
-import { userValidation } from './user-validation';
 import validationRequest from '../../middlewares/validationRequest';
 import { stakeholderValidation } from '../stakeholder/stakeholder-validation';
+import { sellerValidation } from '../seller/seller-validation';
 
 const router = Router();
 
@@ -14,7 +14,7 @@ router.post(
 
 router.post(
   '/create-seller',
-  validationRequest(userValidation.userValidationSchema),
+  validationRequest(sellerValidation.createSellerValidationSchema),
   userController.createSeller,
 );
 

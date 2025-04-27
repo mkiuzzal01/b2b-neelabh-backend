@@ -12,3 +12,5 @@ router.patch(
 );
 router.get('/get-all-sellers', sellerController.getAllSellers);
 router.get('/get-single-seller/:id', sellerController.getSingleSeller);
+
+export const sellerRoute = router;
