@@ -1,8 +1,34 @@
 import { model, Schema } from 'mongoose';
-import { TAdmin } from './stakeholder-interface';
 import { gender } from './stakeholder-constant';
+import validator from 'validator';
+import { TStakeHolder } from './stakeholder-interface';
 
-const stakeholderSchema = new Schema<TAdmin>(
+const stakeholderNameSchema = new Schema({
+  firstName: {
+    type: String,
+    required: true,
+    trim: true,
+    maxlength: [20, 'First name can not more then 20 characters'],
+    validate: {
+      validator: function (value) {
+        const firstNameStr = value.charAt(0).toUpperCase() + value.slice(1);
+        return value === firstNameStr;
+      },
+      message: '{VALUE} is not in capitalize format',
+    },
+  },
+  middleName: { type: String },
+  lastName: {
+    type: String,
+    required: true,
+    validate: {
+      validator: (value: string) => validator.isAlpha(value),
+      message: '{VALUE} is not valid',
+    },
+  },
+});
+
+const stakeholderSchema = new Schema<TStakeHolder>(
   {
     user: {
       type: Schema.Types.ObjectId,
@@ -10,18 +36,17 @@ const stakeholderSchema = new Schema<TAdmin>(
       unique: true,
       ref: 'User',
     },
-    name: {
-      firstName: { type: String, required: true },
-      lastName: { type: String, required: true },
-      middleName: { type: String, required: false },
-    },
-    email: { type: String, required: true },
-    phone: { type: String, required: true },
-    nid: { type: String, required: true },
+    name: stakeholderNameSchema,
+    email: { type: String, unique: true, required: true },
+    phone: { type: String, unique: true, required: true },
+    nid: { type: String, unique: true, required: true },
     dateOfBirth: { type: Date, required: true },
     gender: {
       type: String,
-      enum: gender,
+      enum: {
+        values: gender,
+        message: '{VALUE} is not valid',
+      },
       required: true,
     },
     dateOfJoining: { type: Date, required: true },
@@ -33,8 +58,17 @@ const stakeholderSchema = new Schema<TAdmin>(
     isDeleted: { type: Boolean, default: false },
   },
   {
-    timestamps: true,
+    toJSON: {
+      virtuals: true,
+    },
   },
 );
 
-export const Stakeholder = model<TAdmin>('Stakeholder', stakeholderSchema);
+stakeholderSchema.virtual('fullName').get(function (this: TStakeHolder) {
+  return `${this.name.firstName} ${this.name.middleName} ${this.name.lastName}`;
+});
+
+export const Stakeholder = model<TStakeHolder>(
+  'Stakeholder',
+  stakeholderSchema,
+);

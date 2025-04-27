@@ -43,6 +43,9 @@ const createSellerValidationSchema = z.object({
   }),
 });
 
+const updateSellerValidationSchema = createSellerValidationSchema.partial();
+
 export const sellerValidation = {
   createSellerValidationSchema,
+  updateSellerValidationSchema,
 };

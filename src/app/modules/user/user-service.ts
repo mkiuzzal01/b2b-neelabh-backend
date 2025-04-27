@@ -1,14 +1,14 @@
 import mongoose from 'mongoose';
-import { TAdmin } from '../stakeholder/stakeholder-interface';
 import { TUser } from './user-interface';
 import config from '../../config';
 import { User } from './user-model';
 import { Stakeholder } from '../stakeholder/stakeholder-model';
 import { TSeller } from '../seller/seller-interface';
+import { TStakeHolder } from '../stakeholder/stakeholder-interface';
 
 export const createStackHolderBD = async (
   password: string,
-  payload: TAdmin,
+  payload: TStakeHolder,
 ) => {
   const session = await mongoose.startSession();
   session.startTransaction();

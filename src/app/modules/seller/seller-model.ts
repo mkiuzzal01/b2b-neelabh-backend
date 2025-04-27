@@ -16,8 +16,8 @@ const sellerSchema = new Schema<TSeller>({
   },
   email: {
     type: String,
-    required: true,
     unique: true,
+    required: true,
   },
   phone: {
     type: String,

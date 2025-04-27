@@ -2,12 +2,12 @@ import { Request, RequestHandler, Response } from 'express';
 import sendResponse from '../utils/sendResponse';
 import { userService } from './user-service';
 
-export const createAdmin: RequestHandler = async (
+export const createStackHolder: RequestHandler = async (
   req: Request,
   res: Response,
 ) => {
-  const { password, data } = req.body;
-  const result = await userService.createStackHolderBD(password, data);
+  const { password, stakeholder } = req.body;
+  const result = await userService.createStackHolderBD(password, stakeholder);
   sendResponse(res, {
     statusCode: 200,
     success: true,
