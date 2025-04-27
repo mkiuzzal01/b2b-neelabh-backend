@@ -5,6 +5,8 @@ import { User } from './user-model';
 import { Stakeholder } from '../stakeholder/stakeholder-model';
 import { TSeller } from '../seller/seller-interface';
 import { TStakeHolder } from '../stakeholder/stakeholder-interface';
+import AppError from '../../errors/AppError';
+import status from 'http-status';
 
 export const createStackHolderBD = async (
   password: string,
@@ -23,14 +25,14 @@ export const createStackHolderBD = async (
     const newUser = await User.create([userData], { session });
 
     if (!newUser.length) {
-      throw new Error('Failed to create user');
+      throw new AppError(status.BAD_REQUEST, 'Failed to create user');
     }
 
     //create the admin:
     payload.user = newUser[0]._id;
     const newAdmin = await Stakeholder.create([payload], { session });
     if (!newAdmin.length) {
-      throw new Error('Failed to create admin');
+      throw new AppError(status.BAD_REQUEST, 'Failed to create admin');
     }
 
     await session.commitTransaction();
@@ -44,7 +46,10 @@ export const createStackHolderBD = async (
   }
 };
 
-export const sellerIntoBD = async (password: string, payload: TSeller) => {
+export const createSellerIntoBD = async (
+  password: string,
+  payload: TSeller,
+) => {
   const session = await mongoose.startSession();
   session.startTransaction();
 
@@ -58,14 +63,14 @@ export const sellerIntoBD = async (password: string, payload: TSeller) => {
     const newUser = await User.create([userData], { session });
 
     if (!newUser.length) {
-      throw new Error('Failed to create user');
+      throw new AppError(status.BAD_REQUEST, 'Failed to create user');
     }
 
     //create the admin:
     payload.user = newUser[0]._id;
     const newAdmin = await Stakeholder.create([payload], { session });
     if (!newAdmin.length) {
-      throw new Error('Failed to create admin');
+      throw new AppError(status.BAD_REQUEST, 'Failed to create admin');
     }
 
     await session.commitTransaction();
@@ -81,5 +86,5 @@ export const sellerIntoBD = async (password: string, payload: TSeller) => {
 
 export const userService = {
   createStackHolderBD,
-  sellerIntoBD,
+  createSellerIntoBD,
 };
