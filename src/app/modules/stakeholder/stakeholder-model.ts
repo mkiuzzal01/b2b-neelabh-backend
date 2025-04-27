@@ -1,10 +1,15 @@
 import { model, Schema } from 'mongoose';
 import { TAdmin } from './stakeholder-interface';
+import { gender } from './stakeholder-constant';
 
 const stakeholderSchema = new Schema<TAdmin>(
   {
-    id: { type: String, required: true },
-    user: { type: Schema.Types.ObjectId, ref: 'User' },
+    user: {
+      type: Schema.Types.ObjectId,
+      required: [true, 'User ID is required'],
+      unique: true,
+      ref: 'User',
+    },
     name: {
       firstName: { type: String, required: true },
       lastName: { type: String, required: true },
@@ -13,6 +18,13 @@ const stakeholderSchema = new Schema<TAdmin>(
     email: { type: String, required: true },
     phone: { type: String, required: true },
     nid: { type: String, required: true },
+    dateOfBirth: { type: Date, required: true },
+    gender: {
+      type: String,
+      enum: gender,
+      required: true,
+    },
+    dateOfJoining: { type: Date, required: true },
     address: {
       presentAddress: { type: String, required: true },
       permanentAddress: { type: String, required: true },

@@ -6,8 +6,7 @@ export const createAdmin: RequestHandler = async (
   req: Request,
   res: Response,
 ) => {
-  const { password } = req.body;
-  const { data } = req.body;
+  const { password, data } = req.body;
   const result = await userService.createStackHolderBD(password, data);
   sendResponse(res, {
     statusCode: 200,
@@ -17,23 +16,21 @@ export const createAdmin: RequestHandler = async (
   });
 };
 
-export const createProductionManager: RequestHandler = async (
-  req: Request,
-  res: Response,
-) => {};
-
-export const createAccountant: RequestHandler = async (
-  req: Request,
-  res: Response,
-) => {};
 export const createSeller: RequestHandler = async (
   req: Request,
   res: Response,
-) => {};
+) => {
+  const { password, data } = req.body;
+  const result = await userService.sellerIntoBD(password, data);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Seller created successfully',
+    data: result,
+  });
+};
 
 export const userController = {
-  createAdmin,
-  createProductionManager,
-  createAccountant,
+  createStackHolder,
   createSeller,
 };

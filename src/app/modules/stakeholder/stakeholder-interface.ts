@@ -1,4 +1,5 @@
-import mongoose from 'mongoose';
+import { Types } from 'mongoose';
+import { TGender } from '../../interface/TGender';
 
 export type TAddress = {
   presentAddress: string;
@@ -12,12 +13,14 @@ export type TName = {
 };
 
 export type TAdmin = {
-  id: string;
-  user: mongoose.Types.ObjectId;
+  user: Types.ObjectId;
   name: TName;
   email: string;
   phone: string;
   nid: string;
+  dateOfBirth: Date;
+  gender: TGender;
+  dateOfJoining: Date;
   address: TAddress;
   profileImageUrl: string;
   isDeleted: {

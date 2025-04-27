@@ -1,13 +1,9 @@
 import { model, Schema } from 'mongoose';
 import { TUser } from './user-interface';
+import { profileStatus } from './user-constant';
 
 const userSchema = new Schema<TUser>(
   {
-    userId: {
-      type: String,
-      required: true,
-      unique: true,
-    },
     email: {
       type: String,
       required: true,
@@ -20,7 +16,7 @@ const userSchema = new Schema<TUser>(
     status: {
       type: String,
       required: true,
-      enum: ['active', 'inactive', 'blocked'],
+      enum: profileStatus,
       default: 'active',
     },
     password: {
@@ -38,5 +34,9 @@ const userSchema = new Schema<TUser>(
   },
   { timestamps: true },
 );
+
+// userSchema.pre('save', async function (next)=>{
+//   if(!this.is)
+// })
 
 export const User = model<TUser>('User', userSchema);
