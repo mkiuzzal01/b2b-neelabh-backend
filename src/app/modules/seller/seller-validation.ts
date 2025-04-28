@@ -36,6 +36,9 @@ const createSellerValidationSchema = z.object({
         required_error: 'Payment method is required',
       }),
       bankName: z.enum(bankName, { required_error: 'Bank name is required' }),
+      bankAccountNumber: z
+        .string({ required_error: 'Bank account number is required' })
+        .min(12, { message: 'Bank account number must be at least 12 digits' }),
       profileImageUrl: z
         .string({ required_error: 'Profile image URL is required' })
         .url(),

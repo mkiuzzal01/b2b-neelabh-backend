@@ -5,8 +5,12 @@ import catchAsync from '../utils/catchAsync';
 
 export const createStackHolder: RequestHandler = catchAsync(
   async (req: Request, res: Response) => {
-    const { password, stakeholder } = req.body;
-    const result = await userService.createStackHolderBD(password, stakeholder);
+    const { password, role, stakeholder } = req.body;
+    const result = await userService.createStackHolderBD(
+      password,
+      role,
+      stakeholder,
+    );
     sendResponse(res, {
       statusCode: 200,
       success: true,
@@ -18,8 +22,8 @@ export const createStackHolder: RequestHandler = catchAsync(
 
 export const createSeller: RequestHandler = catchAsync(
   async (req: Request, res: Response) => {
-    const { password, data } = req.body;
-    const result = await userService.createSellerIntoBD(password, data);
+    const { password, seller } = req.body;
+    const result = await userService.createSellerIntoBD(password, seller);
     sendResponse(res, {
       statusCode: 200,
       success: true,

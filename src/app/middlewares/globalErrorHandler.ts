@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { ErrorRequestHandler, NextFunction } from 'express';
 import { ZodError } from 'zod';
 import config from '../config';
@@ -52,7 +53,7 @@ const globalErrorHandler: ErrorRequestHandler = (
     errorSource = [{ path: '', message: err.message }];
   } else if (err instanceof Error) {
     message = err.message;
-    statusCode = statusCode;
+    statusCode = statusCode as any;
     errorSource = [{ path: '', message: err.message }];
   }
 

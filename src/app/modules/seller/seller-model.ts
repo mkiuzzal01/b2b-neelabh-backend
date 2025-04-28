@@ -53,6 +53,11 @@ const sellerSchema = new Schema<TSeller>({
     enum: bankName,
     required: true,
   },
+  bankAccountNumber: {
+    type: String,
+    unique: true,
+    required: true,
+  },
   profileImageUrl: { type: String, required: true },
   isDeleted: { type: Boolean, default: false },
 });

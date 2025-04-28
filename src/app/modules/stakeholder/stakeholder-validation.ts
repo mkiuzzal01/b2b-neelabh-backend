@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { gender } from './stakeholder-constant';
 
 const createStakeholderNameSchema = z.object({
   firstName: z
@@ -33,7 +34,7 @@ const createStakeholderValidation = z.object({
         .refine((date) => !isNaN(Date.parse(date)), {
           message: 'Invalid date format',
         }),
-      gender: z.enum(['male', 'female', 'other'], {
+      gender: z.enum(gender, {
         required_error: 'Gender is required',
       }),
       dateOfJoining: z

@@ -1,9 +1,9 @@
 import { model, Schema } from 'mongoose';
 import { gender } from './stakeholder-constant';
 import validator from 'validator';
-import { TStakeHolder } from './stakeholder-interface';
+import { TStakeHolder, TStakeHolderName } from './stakeholder-interface';
 
-const stakeholderNameSchema = new Schema({
+const stakeholderNameSchema = new Schema<TStakeHolderName>({
   firstName: {
     type: String,
     required: true,
