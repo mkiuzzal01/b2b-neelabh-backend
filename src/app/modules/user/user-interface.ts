@@ -6,12 +6,6 @@ export type TUser = {
   role: TRole;
   status: TProfileStatus;
   password: string;
-  isPasswordChanged: {
-    type: boolean;
-    default: false;
-  };
-  isDeleted: {
-    type: boolean;
-    default: false;
-  };
+  isPasswordChanged: boolean;
+  isDeleted: boolean;
 };

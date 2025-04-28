@@ -15,7 +15,7 @@ export type TName = {
 };
 
 export type TSeller = {
-  user: Types.ObjectId;
+  userId: Types.ObjectId;
   name: TName;
   email: string;
   phone: string;
@@ -23,13 +23,17 @@ export type TSeller = {
   dateOfBirth: Date;
   gender: TGender;
   dateOfJoining: Date;
-  paymentMethod: TPaymentMethod;
-  bankName: TBankName;
-  bankAccountNumber: string;
+  bankAccountInfo: Types.ObjectId;
   address: TAddress;
   profileImageUrl: string;
-  isDeleted: {
-    type: boolean;
-    default: false;
-  };
+  isDeleted: boolean;
+};
+
+export type TBankAccountInfo = {
+  userId: Types.ObjectId;
+  accountHolderName: string;
+  accountNumber: string;
+  paymentMethod: TPaymentMethod;
+  bankName: TBankName;
+  balance: number;
 };

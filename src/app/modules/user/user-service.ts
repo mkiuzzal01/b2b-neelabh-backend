@@ -3,12 +3,14 @@ import { TUser } from './user-interface';
 import config from '../../config';
 import { User } from './user-model';
 import { Stakeholder } from '../stakeholder/stakeholder-model';
-import { TSeller } from '../seller/seller-interface';
+import { TBankAccountInfo, TSeller } from '../seller/seller-interface';
 import { TStakeHolder } from '../stakeholder/stakeholder-interface';
 import AppError from '../../errors/AppError';
 import status from 'http-status';
-import { Seller } from '../seller/seller-model';
+import { BankAccountInfo, Seller } from '../seller/seller-model';
 import { TRole } from '../../interface/TRole';
+import { TProduct } from '../product/product.interface';
+import { Product } from '../product/product.model';
 
 export const createStackHolderBD = async (
   password: string,
@@ -24,15 +26,15 @@ export const createStackHolderBD = async (
     userData.password = password || (config.default_password as string);
     userData.role = role;
 
-    //find the admission semester:
+    //crate the user:
     const newUser = await User.create([userData], { session });
 
     if (!newUser.length) {
       throw new AppError(status.BAD_REQUEST, 'Failed to create user');
     }
 
-    //create the admin:
-    payload.user = newUser[0]._id;
+    //create the stakeholder:
+    payload.userId = newUser[0]._id;
     const newAdmin = await Stakeholder.create([payload], { session });
     if (!newAdmin.length) {
       throw new AppError(status.BAD_REQUEST, 'Failed to create admin');
@@ -57,29 +59,69 @@ export const createSellerIntoBD = async (
   session.startTransaction();
 
   try {
-    const userData: Partial<TUser> = {};
-    userData.email = payload.email;
-    userData.password = password || (config.default_password as string);
-    userData.role = 'seller';
+    const userData: Partial<TUser> = {
+      email: payload.email,
+      password: password || (config.default_password as string),
+      role: 'seller',
+    };
 
-    //find the admission semester:
+    //create the user:
     const newUser = await User.create([userData], { session });
-
     if (!newUser.length) {
       throw new AppError(status.BAD_REQUEST, 'Failed to create user');
     }
 
-    //create the admin:
-    payload.user = newUser[0]._id;
+    const createdUser = newUser[0];
+
+    //create the bank account:
+    const bankAccountPayload: Partial<TBankAccountInfo> = {
+      userId: createdUser._id,
+      ...payload.bankAccountInfo,
+    };
+
+    const newBankAccount = await BankAccountInfo.create([bankAccountPayload], {
+      session,
+    });
+    if (!newBankAccount.length) {
+      throw new AppError(status.BAD_REQUEST, 'Failed to create bank account');
+    }
+
+    const createdBankAccount = newBankAccount[0];
+
+    //create the seller:
+    payload.userId = createdUser._id;
+    payload.bankAccountInfo = createdBankAccount._id;
+
     const newSeller = await Seller.create([payload], { session });
     if (!newSeller.length) {
-      throw new AppError(status.BAD_REQUEST, 'Failed to create admin');
+      throw new AppError(status.BAD_REQUEST, 'Failed to create seller');
     }
 
     await session.commitTransaction();
     session.endSession();
 
-    return newSeller;
+    return newSeller[0];
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+    throw error;
+  }
+};
+
+export const createProductIntoBD = async (payload: TProduct) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    const newProduct = await Product.create([payload], { session });
+    if (!newProduct.length) {
+      throw new AppError(status.BAD_REQUEST, 'Failed to create product');
+    }
+
+    await session.commitTransaction();
+    session.endSession();
+
+    return newProduct[0];
   } catch (error) {
     await session.abortTransaction();
     session.endSession();
@@ -90,4 +132,5 @@ export const createSellerIntoBD = async (
 export const userService = {
   createStackHolderBD,
   createSellerIntoBD,
+  createProductIntoBD,
 };

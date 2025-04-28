@@ -1,13 +1,13 @@
 import { model, Schema } from 'mongoose';
-import { TSeller } from './seller-interface';
-import { bankName, paymentMethod } from './seller-constant';
+import { TBankAccountInfo, TSeller } from './seller-interface';
 import { gender } from '../stakeholder/stakeholder-constant';
 
 const sellerSchema = new Schema<TSeller>({
-  user: {
+  userId: {
     type: Schema.Types.ObjectId,
     ref: 'User',
     required: true,
+    unique: true,
   },
   name: {
     firstName: { type: String, required: true },
@@ -43,19 +43,9 @@ const sellerSchema = new Schema<TSeller>({
     presentAddress: { type: String, required: true },
     permanentAddress: { type: String, required: true },
   },
-  paymentMethod: {
-    type: String,
-    enum: paymentMethod,
-    required: true,
-  },
-  bankName: {
-    type: String,
-    enum: bankName,
-    required: true,
-  },
-  bankAccountNumber: {
-    type: String,
-    unique: true,
+  bankAccountInfo: {
+    type: Schema.Types.ObjectId,
+    ref: 'BankAccountInfo',
     required: true,
   },
   profileImageUrl: { type: String, required: true },
@@ -63,3 +53,20 @@ const sellerSchema = new Schema<TSeller>({
 });
 
 export const Seller = model<TSeller>('Seller', sellerSchema);
+
+//for bank account info:
+const bankAccountInfoSchema = new Schema<TBankAccountInfo>(
+  {
+    userId: { type: Schema.Types.ObjectId, required: true, ref: 'User' },
+    accountNumber: { type: String, required: true },
+    paymentMethod: { type: String, required: true },
+    bankName: { type: String, required: true },
+    balance: { type: Number, default: 0 },
+  },
+  { timestamps: true },
+);
+
+export const BankAccountInfo = model<TBankAccountInfo>(
+  'BankAccountInfo',
+  bankAccountInfoSchema,
+);

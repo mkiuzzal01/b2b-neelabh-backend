@@ -1,6 +1,7 @@
 import { Request, RequestHandler, Response } from 'express';
 import sendResponse from '../utils/sendResponse';
 import { sellerService } from './seller-service';
+import status from 'http-status';
 
 const updateSeller: RequestHandler = async (req: Request, res: Response) => {
   const { id } = req.params;

@@ -13,7 +13,7 @@ export type TStakeHolderName = {
 };
 
 export type TStakeHolder = {
-  user: Types.ObjectId;
+  userId: Types.ObjectId;
   name: TStakeHolderName;
   email: string;
   phone: string;
@@ -23,8 +23,5 @@ export type TStakeHolder = {
   dateOfJoining: Date;
   address: TStakeHolderAddress;
   profileImageUrl: string;
-  isDeleted: {
-    type: boolean;
-    default: false;
-  };
+  isDeleted: boolean;
 };
