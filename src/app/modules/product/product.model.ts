@@ -9,8 +9,8 @@ const createProductSchema = new Schema<TProduct>(
     subTitle: { type: String },
     variants: [
       {
-        colors: { type: [String], required: true },
-        sizeWithQuantity: { type: Object, required: true },
+        name: { type: String, required: true },
+        attribute: { type: Object, required: true },
       },
     ],
     price: { type: Number, required: true },

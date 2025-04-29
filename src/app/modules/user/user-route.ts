@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { userController } from './user-controller';
 import validationRequest from '../../middlewares/validationRequest';
-import { stakeholderValidation } from '../stakeholder/stakeholder-validation';
+import { stakeholderValidation } from '../stake-holder/stakeholder-validation';
 import { sellerValidation } from '../seller/seller-validation';
 import { productValidation } from '../product/product.validation';
 

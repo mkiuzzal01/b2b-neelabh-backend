@@ -1,6 +1,6 @@
 import { model, Schema } from 'mongoose';
 import { TBankAccountInfo, TSeller } from './seller-interface';
-import { gender } from '../stakeholder/stakeholder-constant';
+import { gender } from '../stake-holder/stakeholder-constant';
 
 const sellerSchema = new Schema<TSeller>({
   userId: {

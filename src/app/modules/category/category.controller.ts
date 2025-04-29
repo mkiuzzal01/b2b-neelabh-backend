@@ -4,11 +4,8 @@ import { categoryService } from './category.service';
 
 export const createCategory: RequestHandler = catchAsync(
   async (req: Request, res: Response) => {
-    const { category, subCategory } = req.body;
-    const result = await categoryService.createCategoryIntoDB(
-      category,
-      subCategory,
-    );
+    const category = req.body;
+    const result = await categoryService.createCategoryIntoDB(category);
     res.status(200).json({
       success: true,
       message: 'Category created successfully',
@@ -30,8 +27,8 @@ export const getCategories: RequestHandler = catchAsync(
 
 export const getCategoryById: RequestHandler = catchAsync(
   async (req: Request, res: Response) => {
-    const { id } = req.params;
-    const result = await categoryService.getCategoryByIdFromDB(id);
+    const { _id } = req.params;
+    const result = await categoryService.getCategoryByIdFromDB(_id);
     res.status(200).json({
       success: true,
       message: 'Category retrieved successfully',
@@ -43,12 +40,8 @@ export const getCategoryById: RequestHandler = catchAsync(
 export const updateCategory: RequestHandler = catchAsync(
   async (req: Request, res: Response) => {
     const { id } = req.params;
-    const { category, subCategory } = req.body;
-    const result = await categoryService.updateCategoryIntoDB(
-      id,
-      category,
-      subCategory,
-    );
+    const category = req.body;
+    const result = await categoryService.updateCategoryIntoDB(id, category);
     res.status(200).json({
       success: true,
       message: 'Category updated successfully',
@@ -59,8 +52,8 @@ export const updateCategory: RequestHandler = catchAsync(
 
 export const deleteCategory: RequestHandler = catchAsync(
   async (req: Request, res: Response) => {
-    const { id } = req.params;
-    const result = await categoryService.deleteCategoryFromDB(id);
+    const { _id } = req.params;
+    const result = await categoryService.deleteCategoryFromDB(_id);
     res.status(200).json({
       success: true,
       message: 'Category deleted successfully',

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { gender } from '../stakeholder/stakeholder-constant';
+import { gender } from '../stake-holder/stakeholder-constant';
 import { bankName, paymentMethod } from './seller-constant';
 
 const createSellerValidationSchema = z.object({

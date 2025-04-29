@@ -2,9 +2,9 @@ export type TStatus = 'in-stock' | 'out-of-stock' | 'upcoming';
 export type TActivity = 'in-stock' | 'market-launch';
 
 export type TProductVariant = {
-  colors: string[];
+  name: string;
   sizeWithQuantity: {
-    [size: string]: number;
+    [attribute: string]: number;
   };
 };
 

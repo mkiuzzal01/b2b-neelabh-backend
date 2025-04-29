@@ -1,26 +1,25 @@
 import { Router } from 'express';
 import validationRequest from '../../middlewares/validationRequest';
 import { categoryValidation } from './category.validation';
-import { categoryService } from './category.service';
+import { categoryController } from './category.controller';
 
-const route = Router();
+const router = Router();
 
-route.get(
+router.get('/get-categories', categoryController.getCategories);
+router.get('/get-category/:id', categoryController.getCategoryById);
+
+router.post(
   '/create-category',
   validationRequest(categoryValidation.createCategoryValidationSchema),
-  categoryService.createCategoryIntoDB,
+  categoryController.createCategory,
 );
 
-route.get('/get-categories', categoryService.getCategoriesFromDB);
-
-route.get('/get-category/:id', categoryService.getCategoryByIdFromDB);
-
-route.patch(
+router.patch(
   '/update-category/:id',
-  validationRequest(categoryValidation.createCategoryValidationSchema),
-  categoryService.updateCategoryIntoDB,
+  validationRequest(categoryValidation.updateCategoryValidationSchema),
+  categoryController.updateCategory,
 );
 
-route.delete('/delete-category/:id', categoryService.deleteCategoryFromDB);
+router.delete('/delete-category/:id', categoryController.deleteCategory);
 
-export const categoryRoute = route;
+export const categoryRoute = router;
