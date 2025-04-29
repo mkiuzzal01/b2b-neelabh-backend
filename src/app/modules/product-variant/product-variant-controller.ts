@@ -32,7 +32,7 @@ const getAllProductVariant: RequestHandler = catchAsync(
 
 const getSingleProductVariant: RequestHandler = catchAsync(
   async (req: Request, res: Response) => {
-    const id = req.params;
+    const id = req.params.id;
     const result =
       await ProductVariantService.getSingleProductVariantFromDB(id);
     sendResponse(res, {
@@ -48,7 +48,7 @@ const updateSingleProductVariant: RequestHandler = async (
   req: Request,
   res: Response,
 ) => {
-  const id = req.params;
+  const id = req.params.id;
   const data = req.body;
 
   const result = await ProductVariantService.updateSingleProductVariantIntoDB(
@@ -65,7 +65,7 @@ const updateSingleProductVariant: RequestHandler = async (
 
 const deleteSingleProductVariant: RequestHandler = catchAsync(
   async (req: Request, res: Response) => {
-    const id = req.params;
+    const id = req.params.id;
     const result =
       await ProductVariantService.deleteSingleProductVariantFromDB(id);
     sendResponse(res, {

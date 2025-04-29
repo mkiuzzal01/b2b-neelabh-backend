@@ -16,8 +16,12 @@ const createProductSchema = new Schema<TProduct>(
     price: { type: Number, required: true },
     discount: { type: Number, required: true },
     rating: { type: Number },
-    category: { type: String, required: true },
-    subCategory: { type: String },
+    category: {
+      type: Schema.ObjectId,
+      unique: true,
+      required: true,
+      ref: 'Category',
+    },
     description: { type: String, required: true },
     status: {
       type: String,

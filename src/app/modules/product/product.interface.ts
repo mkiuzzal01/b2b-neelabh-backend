@@ -1,3 +1,5 @@
+import { Types } from 'mongoose';
+
 export type TStatus = 'in-stock' | 'out-of-stock' | 'upcoming';
 export type TActivity = 'in-stock' | 'market-launch';
 
@@ -16,8 +18,7 @@ export type TProduct = {
   price: number;
   discount: number;
   rating?: number;
-  category: string;
-  subCategory?: string;
+  category: Types.ObjectId;
   description: string;
   status: TStatus;
   activity: TActivity;
