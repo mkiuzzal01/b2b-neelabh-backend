@@ -27,8 +27,8 @@ export const getCategories: RequestHandler = catchAsync(
 
 export const getCategoryById: RequestHandler = catchAsync(
   async (req: Request, res: Response) => {
-    const { _id } = req.params;
-    const result = await categoryService.getCategoryByIdFromDB(_id);
+    const id = req.params.id;
+    const result = await categoryService.getCategoryByIdFromDB(id);
     res.status(200).json({
       success: true,
       message: 'Category retrieved successfully',
@@ -52,8 +52,9 @@ export const updateCategory: RequestHandler = catchAsync(
 
 export const deleteCategory: RequestHandler = catchAsync(
   async (req: Request, res: Response) => {
-    const { _id } = req.params;
-    const result = await categoryService.deleteCategoryFromDB(_id);
+    const id = req.params.id;
+    const data = req.body;
+    const result = await categoryService.deleteCategoryFromDB(id, data);
     res.status(200).json({
       success: true,
       message: 'Category deleted successfully',

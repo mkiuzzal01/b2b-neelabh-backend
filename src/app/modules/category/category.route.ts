@@ -5,8 +5,8 @@ import { categoryController } from './category.controller';
 
 const router = Router();
 
-router.get('/get-categories', categoryController.getCategories);
-router.get('/get-category/:id', categoryController.getCategoryById);
+router.get('/all-category', categoryController.getCategories);
+router.get('/single-category/:id', categoryController.getCategoryById);
 
 router.post(
   '/create-category',
@@ -20,6 +20,10 @@ router.patch(
   categoryController.updateCategory,
 );
 
-router.delete('/delete-category/:id', categoryController.deleteCategory);
+router.delete(
+  '/delete-category/:id',
+  validationRequest(categoryValidation.updateCategoryValidationSchema),
+  categoryController.deleteCategory,
+);
 
 export const categoryRoute = router;

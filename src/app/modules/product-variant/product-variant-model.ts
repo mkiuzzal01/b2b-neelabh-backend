@@ -1,18 +1,23 @@
 import { model, Schema } from 'mongoose';
 import { TProductVariant } from './product-variant.interface';
 
-const productVariantSchema = new Schema<TProductVariant>({
-  name: {
-    type: String,
-    unique: true,
-    lowercase: true,
-    required: true,
+const productVariantSchema = new Schema<TProductVariant>(
+  {
+    name: {
+      type: String,
+      unique: true,
+      lowercase: true,
+      required: true,
+    },
+    attributes: {
+      type: [String],
+      required: true,
+    },
   },
-  attributes: {
-    type: [String],
-    required: true,
+  {
+    timestamps: true,
   },
-});
+);
 
 //to lowercase attributes
 productVariantSchema.pre('save', function (next) {

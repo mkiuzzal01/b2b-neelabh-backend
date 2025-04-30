@@ -6,6 +6,10 @@ import { ProductVariant } from './product-variant-model';
 import { TProductVariant } from './product-variant.interface';
 
 const createProductVariantIntoDB = async (payload: TProductVariant) => {
+  const isExist = await ProductVariant.findOne({ name: payload.name });
+  if (!isExist) {
+    throw new AppError(status.BAD_REQUEST, 'The product variant already exist');
+  }
   const result = await ProductVariant.create(payload);
   return result;
 };
@@ -22,7 +26,6 @@ const updateSingleProductVariantIntoDB = async (
   id: string,
   payload: Partial<TProductVariant>,
 ): Promise<TProductVariant | null> => {
-  
   const existingVariant = await ProductVariant.findById(id);
 
   if (!existingVariant) {
