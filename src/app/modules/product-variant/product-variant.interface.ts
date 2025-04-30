@@ -1,4 +1,6 @@
 export type TProductVariant = {
   name: string;
-  attributes: string[];
+  attributes: {
+    value: string;
+  }[];
 };

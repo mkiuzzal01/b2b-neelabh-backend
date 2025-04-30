@@ -1,27 +1,34 @@
-/* eslint-disable prettier/prettier */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import status from 'http-status';
 import AppError from '../../errors/AppError';
 import { ProductVariant } from './product-variant-model';
 import { TProductVariant } from './product-variant.interface';
 
-const createProductVariantIntoDB = async (payload: TProductVariant) => {
-  const isExist = await ProductVariant.findOne({ name: payload.name });
-  if (!isExist) {
-    throw new AppError(status.BAD_REQUEST, 'The product variant already exist');
-  }
-  const result = await ProductVariant.create(payload);
-  return result;
-};
+//get the all  product info:
 const gelAllProductVariantFromDB = async () => {
   const result = await ProductVariant.find();
   return result;
 };
+
+//get the single product info:
 const getSingleProductVariantFromDB = async (id: string) => {
   const result = await ProductVariant.findById(id);
   return result;
 };
 
+//create the product variant:
+const createProductVariantIntoDB = async (payload: TProductVariant) => {
+  const isExist = await ProductVariant.findOne({ name: payload.name });
+
+  if (isExist) {
+    throw new AppError(status.BAD_REQUEST, 'The product variant already exist');
+  }
+
+  const result = await ProductVariant.create(payload);
+  return result;
+};
+
+//update the product variant:
 const updateSingleProductVariantIntoDB = async (
   id: string,
   payload: Partial<TProductVariant>,
@@ -45,12 +52,13 @@ const updateSingleProductVariantIntoDB = async (
   // Add new attributes
   if (payload.attributes && payload.attributes.length > 0) {
     const existingAttributes = existingVariant.attributes.map((attr) =>
-      attr.toLowerCase(),
+      attr.value.toLocaleLowerCase(),
     );
 
     const newAttributes = payload.attributes
-      .map((attr) => attr.trim().toLowerCase())
-      .filter((attr) => !existingAttributes.includes(attr));
+      .map((attr) => attr.value.trim().toLowerCase())
+      .filter((attr) => !existingAttributes.includes(attr))
+      .map((attr) => ({ value: attr }));
 
     if (newAttributes.length > 0) {
       updateQuery.$addToSet = {
@@ -71,34 +79,38 @@ const updateSingleProductVariantIntoDB = async (
   return updatedVariant;
 };
 
+//delete the product:
 const deleteSingleProductVariantFromDB = async (
   id: string,
-  data: Partial<TProductVariant>,
+  payload: Partial<TProductVariant>,
 ) => {
   const existingVariant = await ProductVariant.findById(id);
   if (!existingVariant) {
     throw new AppError(status.NOT_FOUND, 'Product variant not found');
   }
 
-  //If name is not empty, delete the whole variant
-  if (data.name && data.name.trim() !== '') {
+  if (payload.name && payload.name.trim() !== '') {
     const deletedVariant = await ProductVariant.findByIdAndDelete(id);
     return deletedVariant;
   }
 
-  //If name is empty, only delete matching attributes
-  if (data.attributes && data.attributes.length > 0) {
+  if (payload.attributes && payload.attributes.length > 0) {
+    const attributeValuesToDelete = payload.attributes.map((attr) =>
+      attr.value.trim().toLowerCase(),
+    );
+
     await ProductVariant.updateOne(
       { _id: id },
       {
         $pull: {
-          attributes: { $in: data.attributes },
+          attributes: {
+            value: { $in: attributeValuesToDelete },
+          },
         },
       },
     );
   }
 
-  // Return the updated document
   const updatedVariant = await ProductVariant.findById(id);
   return updatedVariant;
 };

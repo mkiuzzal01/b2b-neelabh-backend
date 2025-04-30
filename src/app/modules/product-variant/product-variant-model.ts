@@ -9,19 +9,24 @@ const productVariantSchema = new Schema<TProductVariant>(
       lowercase: true,
       required: true,
     },
-    attributes: {
-      type: [String],
-      required: true,
-    },
+    attributes: [
+      {
+        value: { type: String, required: true },
+      },
+    ],
   },
   {
     timestamps: true,
   },
 );
 
-//to lowercase attributes
+//make to lowercase
 productVariantSchema.pre('save', function (next) {
-  this.attributes = this.attributes.map((attr: string) => attr.toLowerCase());
+  if (this.attributes && Array.isArray(this.attributes)) {
+    this.attributes = this.attributes.map((attr) => ({
+      value: attr.value.toLowerCase(),
+    }));
+  }
   next();
 });
 

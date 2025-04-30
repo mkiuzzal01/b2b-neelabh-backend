@@ -5,9 +5,10 @@ export type TActivity = 'in-stock' | 'market-launch';
 
 export type TProductVariant = {
   name: string;
-  sizeWithQuantity: {
-    [attribute: string]: number;
-  };
+  attributes: {
+    value: string;
+    quantity: number;
+  }[];
 };
 
 export type TProduct = {
