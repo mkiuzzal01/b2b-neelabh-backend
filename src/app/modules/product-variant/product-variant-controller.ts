@@ -66,8 +66,12 @@ const updateSingleProductVariant: RequestHandler = async (
 const deleteSingleProductVariant: RequestHandler = catchAsync(
   async (req: Request, res: Response) => {
     const id = req.params.id;
-    const result =
-      await ProductVariantService.deleteSingleProductVariantFromDB(id);
+    const data = req.body;
+
+    const result = await ProductVariantService.deleteSingleProductVariantFromDB(
+      id,
+      data,
+    );
     sendResponse(res, {
       statusCode: status.OK,
       success: true,

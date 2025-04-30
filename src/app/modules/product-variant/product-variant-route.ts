@@ -31,6 +31,7 @@ router.get(
 
 router.delete(
   '/delete-single-product-variant/:id',
+  validationRequest(ProductVariantValidation.updateProductVariantValidation),
   productVariantController.deleteSingleProductVariant,
 );
 

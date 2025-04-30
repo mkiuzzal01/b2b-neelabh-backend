@@ -21,52 +21,83 @@ const getSingleProductVariantFromDB = async (id: string) => {
 const updateSingleProductVariantIntoDB = async (
   id: string,
   payload: Partial<TProductVariant>,
-) => {
-  // Step 1: Fetch existing document
+): Promise<TProductVariant | null> => {
+  
   const existingVariant = await ProductVariant.findById(id);
+
   if (!existingVariant) {
     throw new AppError(
-      status.BAD_REQUEST,
+      status.NOT_FOUND,
       `Product Variant with ID ${id} not found`,
     );
   }
 
-  // Step 2: Check if any new attribute already exists
+  const updateQuery: any = {};
+
+  // Update name
+  if (payload.name && payload.name.trim() !== '') {
+    updateQuery.name = payload.name.trim().toLowerCase();
+  }
+
+  // Add new attributes
   if (payload.attributes && payload.attributes.length > 0) {
-    const duplicates = payload.attributes.filter((attr) =>
-      existingVariant.attributes.includes(attr.toLowerCase()),
+    const existingAttributes = existingVariant.attributes.map((attr) =>
+      attr.toLowerCase(),
     );
 
-    if (duplicates.length > 0) {
-      throw new AppError(status.BAD_REQUEST, 'Already exists attribute');
+    const newAttributes = payload.attributes
+      .map((attr) => attr.trim().toLowerCase())
+      .filter((attr) => !existingAttributes.includes(attr));
+
+    if (newAttributes.length > 0) {
+      updateQuery.$addToSet = {
+        attributes: { $each: newAttributes },
+      };
     }
   }
 
-  const updateData: any = {};
+  const updatedVariant = await ProductVariant.findByIdAndUpdate(
+    id,
+    updateQuery,
+    {
+      new: true,
+      runValidators: true,
+    },
+  );
 
-  if (payload.name) {
-    updateData.name = payload.name.toLowerCase();
-  }
-
-  if (payload.attributes && payload.attributes.length > 0) {
-    updateData.$addToSet = {
-      attributes: {
-        $each: payload.attributes.map((attr) => attr.toLowerCase()),
-      },
-    };
-  }
-
-  // Perform update
-  const result = await ProductVariant.findByIdAndUpdate(id, updateData, {
-    new: true,
-  });
-
-  return result;
+  return updatedVariant;
 };
 
-const deleteSingleProductVariantFromDB = async (id: string) => {
-  const result = await ProductVariant.findByIdAndDelete(id);
-  return result;
+const deleteSingleProductVariantFromDB = async (
+  id: string,
+  data: Partial<TProductVariant>,
+) => {
+  const existingVariant = await ProductVariant.findById(id);
+  if (!existingVariant) {
+    throw new AppError(status.NOT_FOUND, 'Product variant not found');
+  }
+
+  //If name is not empty, delete the whole variant
+  if (data.name && data.name.trim() !== '') {
+    const deletedVariant = await ProductVariant.findByIdAndDelete(id);
+    return deletedVariant;
+  }
+
+  //If name is empty, only delete matching attributes
+  if (data.attributes && data.attributes.length > 0) {
+    await ProductVariant.updateOne(
+      { _id: id },
+      {
+        $pull: {
+          attributes: { $in: data.attributes },
+        },
+      },
+    );
+  }
+
+  // Return the updated document
+  const updatedVariant = await ProductVariant.findById(id);
+  return updatedVariant;
 };
 
 export const ProductVariantService = {
