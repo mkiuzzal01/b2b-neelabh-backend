@@ -1,21 +1,84 @@
-import { model, Schema } from 'mongoose';
-import { TCategory } from './category.interface';
+import { Schema, model } from 'mongoose';
+import slugify from 'slugify';
+import { TSubCategory, TCategory, TMainCategory } from './category.interface';
 
-const categorySchema = new Schema<TCategory>(
+// SubCategory Schema
+const SubCategorySchema = new Schema<TSubCategory>(
   {
-    category: {
-      type: String,
-      unique: true,
-      required: true,
-    },
+    name: { type: String, required: true, trim: true },
+    slug: { type: String, trim: true, lowercase: true },
   },
-  { timestamps: true },
+  {
+    timestamps: true,
+    toJSON: { virtuals: true },
+  },
 );
 
-// Ensure subCategory.name is lowercased before saving
-categorySchema.pre('save', function (next) {
-  this.category = this.category.toLocaleLowerCase();
+SubCategorySchema.pre('save', function (next) {
+  if (this.isModified('name')) {
+    this.slug = slugify(this.name, { lower: true, strict: true });
+  }
   next();
 });
 
-export const Category = model<TCategory>('Category', categorySchema);
+// Category Schema
+const CategorySchema = new Schema<TCategory>(
+  {
+    name: { type: String, required: true, trim: true },
+    slug: { type: String, trim: true, lowercase: true },
+    subCategory: {
+      type: Schema.Types.ObjectId,
+      ref: 'SubCategory',
+      required: true,
+    },
+    mainCategory: {
+      type: Schema.Types.ObjectId,
+      ref: 'MainCategory',
+      required: true,
+    },
+    isActive: { type: Boolean, default: true },
+  },
+  {
+    timestamps: true,
+    toJSON: { virtuals: true },
+  },
+);
+
+CategorySchema.pre('save', function (next) {
+  if (this.isModified('name')) {
+    this.slug = slugify(this.name, { lower: true, strict: true });
+  }
+  next();
+});
+
+// MainCategory Schema
+const MainCategorySchema = new Schema<TMainCategory>(
+  {
+    name: { type: String, required: true, trim: true },
+    image: { type: String },
+    slug: { type: String, trim: true, lowercase: true },
+    category: { type: Schema.Types.ObjectId, ref: 'Category' },
+  },
+  {
+    timestamps: true,
+    toJSON: { virtuals: true },
+  },
+);
+
+MainCategorySchema.pre('save', function (next) {
+  if (this.isModified('name')) {
+    this.slug = slugify(this.name, { lower: true, strict: true });
+  }
+  next();
+});
+
+// Models
+export const SubCategory = model<TSubCategory>(
+  'SubCategory',
+  SubCategorySchema,
+);
+export const Category = model<TCategory>('Category', CategorySchema);
+export const MainCategory = model<TMainCategory>(
+  'MainCategory',
+  MainCategorySchema,
+);

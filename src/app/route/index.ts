@@ -25,10 +25,6 @@ const routeModule = [
     route: categoryRoute,
   },
   {
-    path: '/sub-category',
-    route: subCategoryRoute,
-  },
-  {
     path: '/product-variant',
     route: productVariantRoute,
   },
