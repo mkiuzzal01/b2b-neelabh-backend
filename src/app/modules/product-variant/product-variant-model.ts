@@ -6,7 +6,6 @@ const productVariantSchema = new Schema<TProductVariant>(
     name: {
       type: String,
       unique: true,
-      lowercase: true,
       required: true,
     },
     attributes: [

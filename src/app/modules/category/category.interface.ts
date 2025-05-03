@@ -1,4 +1,22 @@
-export type TCategory = {
-  category: string;
-  subCategory: string[];
-};
+import { Types } from 'mongoose';
+
+export interface TSubCategory {
+  name: string;
+  slug: string;
+}
+
+export interface TCategory {
+  name: string;
+  image?: string;
+  slug: string;
+  subCategory: Types.ObjectId;
+  mainCategory: Types.ObjectId;
+  isActive?: boolean;
+}
+
+export interface TMainCategory {
+  name: string;
+  image?: string;
+  slug: string;
+  category: Types.ObjectId;
+}

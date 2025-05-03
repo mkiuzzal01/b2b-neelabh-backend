@@ -5,25 +5,22 @@ import { categoryController } from './category.controller';
 
 const router = Router();
 
-router.get('/all-category', categoryController.getCategories);
-router.get('/single-category/:id', categoryController.getCategoryById);
+router.get('/', categoryController.getCategories);
+
+router.get('/:id', categoryController.getCategoryById);
 
 router.post(
-  '/create-category',
-  validationRequest(categoryValidation.createCategoryValidationSchema),
+  '/create',
+  validationRequest(categoryValidation.createCategory),
   categoryController.createCategory,
 );
 
 router.patch(
-  '/update-category/:id',
-  validationRequest(categoryValidation.updateCategoryValidationSchema),
+  '/update/:id',
+  validationRequest(categoryValidation.updateCategory),
   categoryController.updateCategory,
 );
 
-router.delete(
-  '/delete-category/:id',
-  validationRequest(categoryValidation.updateCategoryValidationSchema),
-  categoryController.deleteCategory,
-);
+router.delete('/:id', categoryController.deleteCategory);
 
 export const categoryRoute = router;

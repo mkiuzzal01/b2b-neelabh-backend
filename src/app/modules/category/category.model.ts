@@ -1,16 +1,10 @@
 import { model, Schema } from 'mongoose';
 import { TCategory } from './category.interface';
 
-export const categorySchema = new Schema<TCategory>(
+const categorySchema = new Schema<TCategory>(
   {
     category: {
       type: String,
-      unique: true,
-      lowercase: true,
-      required: true,
-    },
-    subCategory: {
-      type: [String],
       unique: true,
       required: true,
     },
@@ -18,11 +12,9 @@ export const categorySchema = new Schema<TCategory>(
   { timestamps: true },
 );
 
-//to lowercase sub-category:
+// Ensure subCategory.name is lowercased before saving
 categorySchema.pre('save', function (next) {
-  this.subCategory = this.subCategory.map((subCat: string) =>
-    subCat.toLowerCase(),
-  );
+  this.category = this.category.toLocaleLowerCase();
   next();
 });
 

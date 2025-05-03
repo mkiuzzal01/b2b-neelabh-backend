@@ -2,11 +2,11 @@ import { Request, RequestHandler, Response } from 'express';
 import catchAsync from '../utils/catchAsync';
 import { categoryService } from './category.service';
 
-export const createCategory: RequestHandler = catchAsync(
+const createCategory: RequestHandler = catchAsync(
   async (req: Request, res: Response) => {
     const category = req.body;
     const result = await categoryService.createCategoryIntoDB(category);
-    res.status(200).json({
+    res.status(201).json({
       success: true,
       message: 'Category created successfully',
       data: result,
@@ -14,7 +14,7 @@ export const createCategory: RequestHandler = catchAsync(
   },
 );
 
-export const getCategories: RequestHandler = catchAsync(
+const getCategories: RequestHandler = catchAsync(
   async (req: Request, res: Response) => {
     const result = await categoryService.getCategoriesFromDB();
     res.status(200).json({
@@ -25,9 +25,9 @@ export const getCategories: RequestHandler = catchAsync(
   },
 );
 
-export const getCategoryById: RequestHandler = catchAsync(
+const getCategoryById: RequestHandler = catchAsync(
   async (req: Request, res: Response) => {
-    const id = req.params.id;
+    const { id } = req.params;
     const result = await categoryService.getCategoryByIdFromDB(id);
     res.status(200).json({
       success: true,
@@ -37,11 +37,14 @@ export const getCategoryById: RequestHandler = catchAsync(
   },
 );
 
-export const updateCategory: RequestHandler = catchAsync(
+const updateCategory: RequestHandler = catchAsync(
   async (req: Request, res: Response) => {
     const { id } = req.params;
-    const category = req.body;
-    const result = await categoryService.updateCategoryIntoDB(id, category);
+    const categoryUpdates = req.body;
+    const result = await categoryService.updateCategoryIntoDB(
+      id,
+      categoryUpdates,
+    );
     res.status(200).json({
       success: true,
       message: 'Category updated successfully',
@@ -50,11 +53,10 @@ export const updateCategory: RequestHandler = catchAsync(
   },
 );
 
-export const deleteCategory: RequestHandler = catchAsync(
+const deleteCategory: RequestHandler = catchAsync(
   async (req: Request, res: Response) => {
-    const id = req.params.id;
-    const data = req.body;
-    const result = await categoryService.deleteCategoryFromDB(id, data);
+    const { id } = req.params;
+    const result = await categoryService.deleteCategoryFromDB(id);
     res.status(200).json({
       success: true,
       message: 'Category deleted successfully',
