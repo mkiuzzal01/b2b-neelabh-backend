@@ -2,13 +2,14 @@ import status from 'http-status';
 import AppError from '../../errors/AppError';
 import { Category, MainCategory, SubCategory } from './category.model';
 import { TCategory, TMainCategory, TSubCategory } from './category.interface';
-import { generateSlug } from '../utils/generateSlug';
-import { startSession } from 'mongoose';
+import { startSession, Types } from 'mongoose';
+import slugify from 'slugify';
 
 // ================= Main Category =================
 
 const getAllMainCategoryFromDB = async () => {
-  return await MainCategory.find().populate('category');
+  const result = await MainCategory.find().populate('category');
+  return result;
 };
 
 const getMainCategoryByIdFromDB = async (id: string) => {
@@ -17,19 +18,16 @@ const getMainCategoryByIdFromDB = async (id: string) => {
   return result;
 };
 
-const createMainCategoryIntoDB = async (mainCategory: TMainCategory) => {
-  const slug = mainCategory.slug
-    ? generateSlug(mainCategory.slug)
-    : generateSlug(mainCategory.name);
-
-  const isExist = await MainCategory.findOne({ slug });
+const createMainCategoryIntoDB = async (payload: TMainCategory) => {
+  const isExist = await MainCategory.findOne({
+    name: payload.name.toLocaleLowerCase(),
+  });
   if (isExist)
     throw new AppError(status.CONFLICT, 'Main category already exists');
 
   return await MainCategory.create({
-    ...mainCategory,
-    name: mainCategory.name.trim(),
-    slug,
+    ...payload,
+    name: payload.name.trim().toLocaleLowerCase(),
   });
 };
 
@@ -44,20 +42,31 @@ const updateMainCategoryIntoDB = async (
     id,
     {
       ...payload,
-      ...(payload.name && { name: payload.name.trim() }),
-      ...(payload.slug && { slug: payload.slug.trim().toLowerCase() }),
+      name: payload.name?.toLocaleLowerCase(),
+      slug: slugify(payload.name as string, { lower: true, strict: true }),
     },
     { new: true, runValidators: true },
   );
 };
 
 const deleteMainCategoryFromDB = async (id: string) => {
-  const isExist = await MainCategory.findById(id);
-  if (!isExist) throw new AppError(status.NOT_FOUND, 'Main category not found');
+  const objectId = new Types.ObjectId(id);
 
-  return await MainCategory.findByIdAndDelete(id);
+  const exists = await MainCategory.findById(objectId);
+  if (!exists) {
+    throw new AppError(status.NOT_FOUND, 'Main category not found');
+  }
+
+  // Safely remove the reference
+  await Category.updateMany(
+    { mainCategory: objectId },
+    { $set: { mainCategory: null } },
+  );
+
+  await MainCategory.deleteOne({ _id: objectId });
+
+  return null;
 };
-
 // ================= Category =================
 
 const getAllCategoryFromDB = async () => {
@@ -78,14 +87,16 @@ const createCategoryIntoDB = async (payload: TCategory) => {
   try {
     session.startTransaction();
 
-    const isExist = await Category.findOne({ slug: payload.slug }).session(
-      session,
-    );
+    const isExist = await Category.findOne({
+      name: payload.name.toLocaleLowerCase(),
+    }).session(session);
+
     if (isExist) throw new AppError(status.CONFLICT, 'Category already exists');
 
     const isExistMainCategory = await MainCategory.findById(
       payload.mainCategory,
     ).session(session);
+
     if (!isExistMainCategory) {
       throw new AppError(status.NOT_FOUND, 'Main category not found');
     }
@@ -93,11 +104,13 @@ const createCategoryIntoDB = async (payload: TCategory) => {
     const isExistSubCategory = await SubCategory.findById(
       payload.subCategory,
     ).session(session);
+
     if (!isExistSubCategory) {
       throw new AppError(status.NOT_FOUND, 'Sub category not found');
     }
 
     const newCategory = await Category.create([payload], { session });
+
     if (!newCategory?.length) {
       throw new AppError(
         status.INTERNAL_SERVER_ERROR,
@@ -106,7 +119,7 @@ const createCategoryIntoDB = async (payload: TCategory) => {
     }
 
     await MainCategory.findByIdAndUpdate(
-      payload.mainCategory,
+      isExistMainCategory._id,
       { $push: { category: newCategory[0]._id } },
       { session },
     );
@@ -121,6 +134,7 @@ const createCategoryIntoDB = async (payload: TCategory) => {
     throw error;
   }
 };
+
 const updateCategoryIntoBD = async (
   id: string,
   payload: Partial<TCategory>,
@@ -132,8 +146,8 @@ const updateCategoryIntoBD = async (
     id,
     {
       ...payload,
-      ...(payload.name && { name: payload.name.trim() }),
-      ...(payload.slug && { slug: payload.slug.trim().toLowerCase() }),
+      name: payload.name?.toLocaleLowerCase(),
+      slug: slugify(payload.name as string, { lower: true, strict: true }),
     },
     { new: true, runValidators: true },
   );
@@ -143,7 +157,14 @@ const deleteCategoryFromDB = async (id: string) => {
   const isExist = await Category.findById(id);
   if (!isExist) throw new AppError(status.NOT_FOUND, 'Category not found');
 
-  return await Category.findByIdAndDelete(id);
+  //delete main category:
+  await MainCategory.findByIdAndUpdate(isExist.mainCategory, {
+    $pull: { category: isExist?._id },
+  });
+
+  //delete category:
+  await Category.deleteOne({ _id: id });
+  return null;
 };
 
 // ================= Sub Category =================
@@ -158,19 +179,14 @@ const getSingleSubCategoryFromDB = async (id: string) => {
   return result;
 };
 
-const createSubCategoryIntoDB = async (subCategory: TSubCategory) => {
-  const slug = subCategory.slug
-    ? generateSlug(subCategory.slug)
-    : generateSlug(subCategory.name);
-
-  const isExist = await SubCategory.findOne({ slug });
+const createSubCategoryIntoDB = async (payload: TSubCategory) => {
+  const isExist = await SubCategory.findOne({ name: payload.name });
   if (isExist)
     throw new AppError(status.CONFLICT, 'Sub-category already exists');
 
   return await SubCategory.create({
-    ...subCategory,
-    name: subCategory.name.trim(),
-    slug,
+    ...payload,
+    name: payload.name.trim().toLocaleLowerCase(),
   });
 };
 
@@ -185,8 +201,8 @@ const updateSubCategoryIntoDB = async (
     id,
     {
       ...payload,
-      ...(payload.name && { name: payload.name.trim() }),
-      ...(payload.slug && { slug: payload.slug.trim().toLowerCase() }),
+      name: payload.name?.trim().toLocaleLowerCase(),
+      slug: slugify(payload.name as string, { lower: true, strict: true }),
     },
     { new: true, runValidators: true },
   );

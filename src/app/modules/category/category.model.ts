@@ -46,6 +46,7 @@ const CategorySchema = new Schema<TCategory>(
 
 CategorySchema.pre('save', function (next) {
   if (this.isModified('name')) {
+    this.name = this.name.toLocaleLowerCase();
     this.slug = slugify(this.name, { lower: true, strict: true });
   }
   next();
@@ -56,7 +57,7 @@ const MainCategorySchema = new Schema<TMainCategory>(
   {
     name: { type: String, required: true, trim: true },
     image: { type: String },
-    slug: { type: String, trim: true, lowercase: true },
+    slug: { type: String, trim: true, unique: true, lowercase: true },
     category: { type: Schema.Types.ObjectId, ref: 'Category' },
   },
   {

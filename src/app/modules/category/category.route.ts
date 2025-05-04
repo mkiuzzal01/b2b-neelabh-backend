@@ -9,7 +9,10 @@ const router = Router();
 
 router.get('/all-main-category', categoryController.getAllMainCategories);
 
-router.get('/single-main-category/:id', categoryController.getSingleCategory);
+router.get(
+  '/single-main-category/:id',
+  categoryController.getSingleMainCategory,
+);
 
 router.post(
   '/create-main-category',
