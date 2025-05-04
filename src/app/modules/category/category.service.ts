@@ -2,6 +2,7 @@ import status from 'http-status';
 import AppError from '../../errors/AppError';
 import { Category, MainCategory, SubCategory } from './category.model';
 import { TCategory, TMainCategory, TSubCategory } from './category.interface';
+
 import { startSession, Types } from 'mongoose';
 import slugify from 'slugify';
 
@@ -211,8 +212,8 @@ const updateSubCategoryIntoDB = async (
 const deleteSubCategoryFromDB = async (id: string) => {
   const isExist = await SubCategory.findById(id);
   if (!isExist) throw new AppError(status.NOT_FOUND, 'Sub-category not found');
-
-  return await SubCategory.findByIdAndDelete(id);
+  await SubCategory.findByIdAndDelete(id);
+  return null;
 };
 
 // ================= Exports =================
