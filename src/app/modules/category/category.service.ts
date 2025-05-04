@@ -2,7 +2,6 @@ import status from 'http-status';
 import AppError from '../../errors/AppError';
 import { Category, MainCategory, SubCategory } from './category.model';
 import { TCategory, TMainCategory, TSubCategory } from './category.interface';
-
 import { startSession, Types } from 'mongoose';
 import slugify from 'slugify';
 

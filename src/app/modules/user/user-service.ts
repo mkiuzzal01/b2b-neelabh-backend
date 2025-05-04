@@ -11,6 +11,11 @@ import { BankAccountInfo, Seller } from '../seller/seller-model';
 import { TRole } from '../../interface/TRole';
 import { TProduct } from '../product/product.interface';
 import { Product } from '../product/product.model';
+import {
+  Category,
+  MainCategory,
+  SubCategory,
+} from '../category/category.model';
 
 export const createStackHolderBD = async (
   password: string,
@@ -113,6 +118,37 @@ export const createProductIntoBD = async (payload: TProduct) => {
   session.startTransaction();
 
   try {
+    const isExitsProduct = await Product.findOne({
+      productCode: payload.productCode,
+    });
+
+    if (isExitsProduct) {
+      throw new AppError(status.CONFLICT, 'The products code already exits');
+    }
+
+    const isExistMainCategory = await MainCategory.findById({
+      _id: payload.categories.mainCategory,
+    });
+
+    if (!isExistMainCategory) {
+      throw new AppError(status.NOT_FOUND, 'The main category not found');
+    }
+
+    const isExistCategory = await Category.findById({
+      _id: payload.categories.category,
+    });
+    if (!isExistCategory) {
+      throw new AppError(status.NOT_FOUND, 'The category not found');
+    }
+
+    const isExitsSubCategory = await SubCategory.findById({
+      _id: payload.categories.subCategory,
+    });
+
+    if (!isExitsSubCategory) {
+      throw new AppError(status.NOT_FOUND, 'The sub category not found');
+    }
+
     const newProduct = await Product.create([payload], { session });
     if (!newProduct.length) {
       throw new AppError(status.BAD_REQUEST, 'Failed to create product');

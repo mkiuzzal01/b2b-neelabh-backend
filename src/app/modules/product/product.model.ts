@@ -2,32 +2,54 @@ import { model, Schema } from 'mongoose';
 import { TProduct } from './product.interface';
 import { productActivity, productStatus } from './product.constant';
 
-const createProductSchema = new Schema<TProduct>(
+export const CategoriesSchema = {
+  mainCategory: {
+    type: Schema.Types.ObjectId,
+    ref: 'MainCategory',
+    required: true,
+  },
+  category: {
+    type: Schema.Types.ObjectId,
+    ref: 'Category',
+    required: true,
+  },
+  subCategory: {
+    type: Schema.Types.ObjectId,
+    ref: 'SubCategory',
+    required: true,
+  },
+};
+
+export const VariantSchema = new Schema(
   {
-    productCode: { type: String, required: true, unique: true },
-    title: { type: String, required: true },
-    subTitle: { type: String },
-    variants: [
+    name: { type: String, required: true },
+    attributes: [
       {
-        name: { type: String, required: true },
-        attribute: { type: Object, required: true },
+        value: { type: String, required: true },
+        quantity: { type: Number, required: true },
       },
     ],
+  },
+  { _id: false },
+);
+
+const createProductSchema = new Schema<TProduct>(
+  {
+    productCode: { type: String, unique: true, required: true },
+    title: { type: String, required: true },
+    subTitle: { type: String },
+    variants: [VariantSchema],
     price: { type: Number, required: true },
     discount: { type: Number, required: true },
     rating: { type: Number },
-    category: {
-      type: Schema.ObjectId,
-      unique: true,
-      required: true,
-      ref: 'Category',
-    },
+    categories: CategoriesSchema,
     description: { type: String, required: true },
     status: {
       type: String,
       enum: productStatus,
       default: 'in-stock',
     },
+
     activity: {
       type: String,
       enum: productActivity,

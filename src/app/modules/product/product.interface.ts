@@ -11,6 +11,12 @@ export type TProductVariant = {
   }[];
 };
 
+export type TCategories = {
+  mainCategory: Types.ObjectId;
+  category: Types.ObjectId;
+  subCategory: Types.ObjectId;
+};
+
 export type TProduct = {
   productCode: string;
   title: string;
@@ -19,7 +25,7 @@ export type TProduct = {
   price: number;
   discount: number;
   rating?: number;
-  category: Types.ObjectId;
+  categories: TCategories;
   description: string;
   status: TStatus;
   activity: TActivity;

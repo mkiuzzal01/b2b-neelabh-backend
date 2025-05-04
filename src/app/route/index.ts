@@ -4,7 +4,8 @@ import { stakeholderRoute } from '../modules/stake-holder/stakeholder-route';
 import { sellerRoute } from '../modules/seller/seller-route';
 import { categoryRoute } from '../modules/category/category.route';
 import { productVariantRoute } from '../modules/product-variant/product-variant-route';
-import { subCategoryRoute } from '../modules/sub-category/sub-category.route';
+import { ProductRoute } from '../modules/product/product.route';
+
 const router = Router();
 
 const routeModule = [
@@ -27,6 +28,10 @@ const routeModule = [
   {
     path: '/product-variant',
     route: productVariantRoute,
+  },
+  {
+    path: '/product',
+    route: ProductRoute,
   },
 ];
 
