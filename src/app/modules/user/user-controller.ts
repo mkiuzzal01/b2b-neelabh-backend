@@ -13,7 +13,7 @@ export const createStackHolder: RequestHandler = catchAsync(
       stakeholder,
     );
     sendResponse(res, {
-      statusCode: 200,
+      statusCode: status.OK,
       success: true,
       message: 'Stack holder created successfully',
       data: result,
@@ -26,7 +26,7 @@ export const createSeller: RequestHandler = catchAsync(
     const { password, seller } = req.body;
     const result = await userService.createSellerIntoBD(password, seller);
     sendResponse(res, {
-      statusCode: 200,
+      statusCode: status.OK,
       success: true,
       message: 'Seller created successfully',
       data: result,

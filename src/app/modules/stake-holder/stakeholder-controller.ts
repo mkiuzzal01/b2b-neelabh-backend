@@ -3,24 +3,6 @@ import { stakeholderService } from './stakeholder-service';
 import sendResponse from '../utils/sendResponse';
 import { status } from 'http-status';
 
-const updateStakeholder: RequestHandler = async (
-  req: Request,
-  res: Response,
-) => {
-  const { id } = req.params;
-  const { stakeholder } = req.body;
-  const result = await stakeholderService.updateStakeholderIntoDB(
-    id,
-    stakeholder,
-  );
-  sendResponse(res, {
-    statusCode: status.OK,
-    success: true,
-    message: 'Stakeholder updated successfully',
-    data: result,
-  });
-};
-
 const getAllStakeholder: RequestHandler = async (
   req: Request,
   res: Response,
@@ -47,9 +29,41 @@ const getSingleStakeholder: RequestHandler = async (
     data: result,
   });
 };
+const updateStakeholder: RequestHandler = async (
+  req: Request,
+  res: Response,
+) => {
+  const { id } = req.params;
+  const { stakeholder } = req.body;
+  const result = await stakeholderService.updateStakeholderIntoDB(
+    id,
+    stakeholder,
+  );
+  sendResponse(res, {
+    statusCode: status.OK,
+    success: true,
+    message: 'Stakeholder updated successfully',
+    data: result,
+  });
+};
+
+const deleteStakeHolder: RequestHandler = async (
+  req: Request,
+  res: Response,
+) => {
+  const id = req.params.id;
+  const result = await stakeholderService.deleteStakeHolderFromDB(id);
+  sendResponse(res, {
+    statusCode: status.OK,
+    success: true,
+    message: 'Stakeholder deleted successfully',
+    data: result,
+  });
+};
 
 export const stakeholderController = {
-  updateStakeholder,
   getAllStakeholder,
   getSingleStakeholder,
+  updateStakeholder,
+  deleteStakeHolder,
 };

@@ -15,7 +15,7 @@ router.post(
 
 router.post(
   '/create-seller',
-  validationRequest(sellerValidation.createSellerValidationSchema),
+  validationRequest(sellerValidation.createSellerValidation),
   userController.createSeller,
 );
 

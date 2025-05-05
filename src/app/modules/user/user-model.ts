@@ -1,5 +1,5 @@
 import { model, Schema } from 'mongoose';
-import { TUser } from './user-interface';
+import { TBankAccountInfo, TUser } from './user-interface';
 import { profileStatus } from './user-constant';
 import bcrypt from 'bcrypt';
 import config from '../../config';
@@ -54,3 +54,21 @@ userSchema.post('save', function (doc, next) {
 });
 
 export const User = model<TUser>('User', userSchema);
+
+//for bank account info:
+const bankAccountInfoSchema = new Schema<TBankAccountInfo>(
+  {
+    userId: { type: Schema.Types.ObjectId, required: true, ref: 'User' },
+    accountNumber: { type: String, required: true },
+    paymentMethod: { type: String, required: true },
+    bankName: { type: String, required: true },
+    balance: { type: Number, default: 0 },
+    status: { type: String, default: 'active' },
+  },
+  { timestamps: true },
+);
+
+export const BankAccountInfo = model<TBankAccountInfo>(
+  'BankAccountInfo',
+  bankAccountInfoSchema,
+);

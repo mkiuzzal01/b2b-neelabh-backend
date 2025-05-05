@@ -7,7 +7,7 @@ import status from 'http-status';
 const updateProduct: RequestHandler = catchAsync(async (req, res) => {
   const id = req.params.id;
   const data = req.body;
-  const result = await productService.getSingleProductFromDB(id, data);
+  const result = await productService.updateProductIntoBD(id, data);
   sendResponse(res, {
     statusCode: status.OK,
     success: true,
@@ -37,7 +37,7 @@ const getSingleProduct: RequestHandler = catchAsync(async (req, res) => {
 });
 const deleteProduct: RequestHandler = catchAsync(async (req, res) => {
   const id = req.params.id;
-  const result = await productService.getSingleProductFromDB(id);
+  const result = await productService.deleteProductFromDB(id);
   sendResponse(res, {
     statusCode: status.OK,
     success: true,

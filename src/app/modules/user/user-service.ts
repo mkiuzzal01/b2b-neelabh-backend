@@ -1,13 +1,13 @@
 import mongoose from 'mongoose';
-import { TUser } from './user-interface';
+import { TBankAccountInfo, TUser } from './user-interface';
 import config from '../../config';
-import { User } from './user-model';
+import { BankAccountInfo, User } from './user-model';
 import { Stakeholder } from '../stake-holder/stakeholder-model';
-import { TBankAccountInfo, TSeller } from '../seller/seller-interface';
+import { TSeller } from '../seller/seller-interface';
 import { TStakeHolder } from '../stake-holder/stakeholder-interface';
 import AppError from '../../errors/AppError';
 import status from 'http-status';
-import { BankAccountInfo, Seller } from '../seller/seller-model';
+import { Seller } from '../seller/seller-model';
 import { TRole } from '../../interface/TRole';
 import { TProduct } from '../product/product.interface';
 import { Product } from '../product/product.model';
@@ -17,7 +17,7 @@ import {
   SubCategory,
 } from '../category/category.model';
 
-export const createStackHolderBD = async (
+const createStackHolderBD = async (
   password: string,
   role: TRole,
   payload: TStakeHolder,
@@ -56,14 +56,10 @@ export const createStackHolderBD = async (
   }
 };
 
-export const createSellerIntoBD = async (
-  password: string,
-  payload: TSeller,
-) => {
+const createSellerIntoBD = async (password: string, payload: TSeller) => {
   const session = await mongoose.startSession();
-  session.startTransaction();
-
   try {
+    session.startTransaction();
     const userData: Partial<TUser> = {
       email: payload.email,
       password: password || (config.default_password as string),
@@ -113,7 +109,7 @@ export const createSellerIntoBD = async (
   }
 };
 
-export const createProductIntoBD = async (payload: TProduct) => {
+const createProductIntoBD = async (payload: TProduct) => {
   const session = await mongoose.startSession();
   session.startTransaction();
 

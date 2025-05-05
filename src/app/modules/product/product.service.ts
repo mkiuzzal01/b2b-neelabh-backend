@@ -38,14 +38,11 @@ const updateProductIntoBD = async (id: string, payload: Partial<TProduct>) => {
     throw new AppError(status.NOT_FOUND, 'The sub category not found');
   }
 
-  const result = await Product.findByIdAndUpdate(id, payload, {
+  const result = await Product.findByIdAndUpdate({ _id: id }, payload, {
     new: true,
     runValidators: true,
-  }).populate([
-    { path: 'categories.mainCategory' },
-    { path: 'categories.category' },
-    { path: 'categories.subCategory' },
-  ]);
+  });
+
   return result;
 };
 

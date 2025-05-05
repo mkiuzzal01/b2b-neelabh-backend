@@ -5,12 +5,13 @@ import { sellerController } from './seller-controller';
 
 const router = Router();
 
+router.get('/all-seller', sellerController.getAllSellers);
+router.get('/single-seller/:id', sellerController.getSingleSeller);
 router.patch(
   '/update-seller/:id',
-  validationRequest(sellerValidation.updateSellerValidationSchema),
+  validationRequest(sellerValidation.updateSellerValidation),
   sellerController.updateSeller,
 );
-router.get('/get-all-sellers', sellerController.getAllSellers);
-router.get('/get-single-seller/:id', sellerController.getSingleSeller);
+router.get('/delete-seller/:id', sellerController.deleteSeller);
 
 export const sellerRoute = router;

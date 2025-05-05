@@ -10,7 +10,6 @@ const SubCategorySchema = new Schema<TSubCategory>(
   },
   {
     timestamps: true,
-    toJSON: { virtuals: true },
   },
 );
 
@@ -40,7 +39,6 @@ const CategorySchema = new Schema<TCategory>(
   },
   {
     timestamps: true,
-    toJSON: { virtuals: true },
   },
 );
 
@@ -62,7 +60,6 @@ const MainCategorySchema = new Schema<TMainCategory>(
   },
   {
     timestamps: true,
-    toJSON: { virtuals: true },
   },
 );
 
