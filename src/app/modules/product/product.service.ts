@@ -65,7 +65,16 @@ const getSingleProductFromDB = async (id: string) => {
 };
 
 const deleteProductFromDB = async (id: string) => {
-  await Product.findByIdAndDelete(id);
+  await Product.findByIdAndUpdate(
+    id,
+    {
+      isDeleted: true,
+    },
+    {
+      new: true,
+      runValidators: true,
+    },
+  );
   return null;
 };
 

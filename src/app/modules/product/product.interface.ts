@@ -20,6 +20,7 @@ export type TCategories = {
 export type TProduct = {
   productCode: string;
   title: string;
+  slug?: string;
   subTitle?: string;
   variants: TProductVariant[];
   price: number;

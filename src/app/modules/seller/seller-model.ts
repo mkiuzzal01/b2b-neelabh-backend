@@ -1,6 +1,7 @@
 import { model, Schema } from 'mongoose';
 import { TSeller } from './seller-interface';
 import { gender } from '../stake-holder/stakeholder-constant';
+import slugify from 'slugify';
 
 const sellerSchema = new Schema<TSeller>(
   {
@@ -63,5 +64,12 @@ const sellerSchema = new Schema<TSeller>(
 sellerSchema.virtual('fullName').get(function () {
   return `${this?.name?.firstName} ${this?.name?.middleName} ${this?.name?.lastName}`;
 });
+
+// sellerSchema.pre('save', function (next) {
+//   if (this.isModified('fullName')) {
+//     this.slug = slugify(this.title, { lower: true, strict: true });
+//   }
+//   next();
+// });
 
 export const Seller = model<TSeller>('Seller', sellerSchema);

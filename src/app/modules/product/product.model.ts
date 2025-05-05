@@ -1,8 +1,9 @@
 import { model, Schema } from 'mongoose';
 import { TProduct } from './product.interface';
 import { productActivity, productStatus } from './product.constant';
+import slugify from 'slugify';
 
-export const CategoriesSchema = {
+export const categoriesSchema = {
   mainCategory: {
     type: Schema.Types.ObjectId,
     ref: 'MainCategory',
@@ -20,7 +21,7 @@ export const CategoriesSchema = {
   },
 };
 
-export const VariantSchema = new Schema(
+export const variantSchema = new Schema(
   {
     name: { type: String, required: true },
     attributes: [
@@ -33,16 +34,17 @@ export const VariantSchema = new Schema(
   { _id: false },
 );
 
-const createProductSchema = new Schema<TProduct>(
+const productSchema = new Schema<TProduct>(
   {
     productCode: { type: String, unique: true, required: true },
     title: { type: String, required: true },
+    slug: { type: String, unique: true },
     subTitle: { type: String },
-    variants: [VariantSchema],
+    variants: [variantSchema],
     price: { type: Number, required: true },
     discount: { type: Number, required: true },
     rating: { type: Number },
-    categories: CategoriesSchema,
+    categories: categoriesSchema,
     description: { type: String, required: true },
     status: {
       type: String,
@@ -62,4 +64,11 @@ const createProductSchema = new Schema<TProduct>(
   },
 );
 
-export const Product = model<TProduct>('Product', createProductSchema);
+productSchema.pre('save', function (next) {
+  if (this.isModified('title')) {
+    this.slug = slugify(this.title, { lower: true, strict: true });
+  }
+  next();
+});
+
+export const Product = model<TProduct>('Product', productSchema);
