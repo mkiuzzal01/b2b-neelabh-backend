@@ -1,5 +1,5 @@
 import { Schema, model } from 'mongoose';
-import { TRequisition } from './requisition.interface';
+import { TFeedback, TRequisition } from './requisition.interface';
 import { requisitionStatus, requisitionType } from './requisition.constant';
 import slugify from 'slugify';
 
@@ -14,10 +14,17 @@ const requisitionSchema = new Schema<TRequisition>(
       required: true,
       enum: requisitionType,
     },
+    description: {
+      type: String,
+    },
     stats: {
       type: String,
       enum: requisitionStatus,
       default: 'pending',
+    },
+    feedbackId: {
+      type: Schema.Types.ObjectId,
+      ref: 'Feedback',
     },
   },
   { timestamps: true },
@@ -34,3 +41,11 @@ export const Requisition = model<TRequisition>(
   'Requisition',
   requisitionSchema,
 );
+
+const feedBackSchema = new Schema<TFeedback>({
+  creatorId: { type: Schema.Types.ObjectId, ref: 'User' },
+  requisitionId: { type: Schema.Types.ObjectId, ref: 'Requisition' },
+  description: { type: String, required: true },
+});
+
+export const Feedback = model<TFeedback>('Feedback', feedBackSchema);

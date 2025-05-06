@@ -8,5 +8,13 @@ export type TRequisition = {
   slug?: string;
   subTitle: string;
   type: TRequisitionType;
+  description: string;
   stats?: TRequisitionStatus;
+  feedbackId?: Types.ObjectId;
+};
+
+export type TFeedback = {
+  creatorId: Types.ObjectId;
+  requisitionId: Types.ObjectId;
+  description: string;
 };

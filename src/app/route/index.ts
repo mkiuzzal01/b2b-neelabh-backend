@@ -6,7 +6,10 @@ import { categoryRoute } from '../modules/category/category.route';
 import { productVariantRoute } from '../modules/product-variant/product-variant-route';
 import { ProductRoute } from '../modules/product/product.route';
 import { noticeRouter } from '../modules/notice/notice.route';
-import { requisitionRouter } from '../modules/requisition/requisition.route';
+import {
+  feedbackRouter,
+  requisitionRouter,
+} from '../modules/requisition/requisition.route';
 
 const router = Router();
 
@@ -42,6 +45,10 @@ const routeModule = [
   {
     path: '/requisition',
     route: requisitionRouter,
+  },
+  {
+    path: '/feedback',
+    route: feedbackRouter,
   },
 ];
 

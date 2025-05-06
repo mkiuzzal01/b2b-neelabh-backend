@@ -1,6 +1,6 @@
 import { RequestHandler } from 'express';
 import catchAsync from '../utils/catchAsync';
-import { requisitionService } from './requisition.service';
+import { feedbackServices, requisitionService } from './requisition.service';
 import sendResponse from '../utils/sendResponse';
 import status from 'http-status';
 
@@ -61,4 +61,69 @@ export const requisitionController = {
   allRequisition,
   singleRequisition,
   deleteRequisition,
+};
+
+//feedback controller:
+
+const createFeedback = catchAsync(async (req, res) => {
+  const data = req.body;
+  const result = await feedbackServices.createFeedbackIntoDB(data);
+  sendResponse(res, {
+    statusCode: status.OK,
+    success: true,
+    message: 'The feedback created successfully',
+    data: result,
+  });
+});
+
+const updateFeedback = catchAsync(async (req, res) => {
+  const id = req.params.id;
+  const data = req.body;
+  const result = await feedbackServices.updateFeedbackIntoDB(id, data);
+  sendResponse(res, {
+    statusCode: status.OK,
+    success: true,
+    message: 'The feedback updated successfully',
+    data: result,
+  });
+});
+
+const deleteFeedback = catchAsync(async (req, res) => {
+  const id = req.params.id;
+  const result = await feedbackServices.deleteFeedbackFromDB(id);
+  sendResponse(res, {
+    statusCode: status.OK,
+    success: true,
+    message: 'The feedback deleted successfully',
+    data: result,
+  });
+});
+
+const allFeedback = catchAsync(async (req, res) => {
+  const result = await feedbackServices.allFeedbackFromDB();
+  sendResponse(res, {
+    statusCode: status.OK,
+    success: true,
+    message: 'All feedback retrieve successfully',
+    data: result,
+  });
+});
+
+const singleFeedback = catchAsync(async (req, res) => {
+  const id = req.params.id;
+  const result = await feedbackServices.singleFeedbackFromDB(id);
+  sendResponse(res, {
+    statusCode: status.OK,
+    success: true,
+    message: 'The feedback retrieve successfully',
+    data: result,
+  });
+});
+
+export const feedbackController = {
+  createFeedback,
+  updateFeedback,
+  deleteFeedback,
+  allFeedback,
+  singleFeedback,
 };
