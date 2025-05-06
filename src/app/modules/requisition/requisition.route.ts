@@ -9,17 +9,20 @@ import {
 const route = Router();
 
 route.get('/all-requisition', requisitionController.allRequisition);
-route.get('/single-requisition', requisitionController.singleRequisition);
+route.get('/single-requisition/:id', requisitionController.singleRequisition);
 route.post(
   '/create-requisition',
   validationRequest(createRequisitionValidationSchema),
   requisitionController.createRequisition,
 );
 route.patch(
-  '/update-requisition',
+  '/update-requisition/:id',
   validationRequest(updateRequisitionValidationSchema),
   requisitionController.updateRequisition,
 );
-route.delete('/delete-requisition', requisitionController.deleteRequisition);
+route.delete(
+  '/delete-requisition/:id',
+  requisitionController.deleteRequisition,
+);
 
 export const requisitionRouter = route;

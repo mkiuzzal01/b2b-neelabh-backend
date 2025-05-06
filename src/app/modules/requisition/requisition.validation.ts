@@ -6,7 +6,7 @@ export const createRequisitionValidationSchema = z.object({
     title: z.string().min(1, 'Title is required'),
     subTitle: z.string().optional(),
     type: z.enum(requisitionType),
-    stats: z.enum(requisitionStatus),
+    stats: z.enum(requisitionStatus).default('pending').optional(),
   }),
 });
 
@@ -15,6 +15,6 @@ export const updateRequisitionValidationSchema = z.object({
     title: z.string().min(1).optional(),
     subTitle: z.string().optional(),
     type: z.enum(requisitionType).optional(),
-    stats: z.enum(requisitionStatus).optional(),
+    stats: z.enum(requisitionStatus).default('pending').optional(),
   }),
 });
