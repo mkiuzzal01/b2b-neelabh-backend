@@ -38,7 +38,7 @@ const productSchema = new Schema<TProduct>(
   {
     productCode: { type: String, unique: true, required: true },
     title: { type: String, required: true },
-    slug: { type: String, unique: true },
+    slug: { type: String },
     subTitle: { type: String },
     variants: [variantSchema],
     price: { type: Number, required: true },

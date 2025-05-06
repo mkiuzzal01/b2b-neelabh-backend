@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import { TBankAccountInfo, TUser } from './user-interface';
 import config from '../../config';
-import { BankAccountInfo, User } from './user-model';
+import { BankAccount, User } from './user-model';
 import { Stakeholder } from '../stake-holder/stakeholder-model';
 import { TSeller } from '../seller/seller-interface';
 import { TStakeHolder } from '../stake-holder/stakeholder-interface';
@@ -58,8 +58,9 @@ const createStackHolderBD = async (
 
 const createSellerIntoBD = async (password: string, payload: TSeller) => {
   const session = await mongoose.startSession();
+  session.startTransaction();
+
   try {
-    session.startTransaction();
     const userData: Partial<TUser> = {
       email: payload.email,
       password: password || (config.default_password as string),
@@ -80,7 +81,7 @@ const createSellerIntoBD = async (password: string, payload: TSeller) => {
       ...payload.bankAccountInfo,
     };
 
-    const newBankAccount = await BankAccountInfo.create([bankAccountPayload], {
+    const newBankAccount = await BankAccount.create([bankAccountPayload], {
       session,
     });
     if (!newBankAccount.length) {

@@ -15,6 +15,7 @@ export type TName = {
 export type TSeller = {
   userId: Types.ObjectId;
   name: TName;
+  slug?: string;
   email: string;
   phone: string;
   nid: string;

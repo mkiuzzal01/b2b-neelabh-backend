@@ -2,6 +2,7 @@ import { model, Schema } from 'mongoose';
 import { gender } from './stakeholder-constant';
 import validator from 'validator';
 import { TStakeHolder, TStakeHolderName } from './stakeholder-interface';
+import slugify from 'slugify';
 
 const stakeholderNameSchema = new Schema<TStakeHolderName>({
   firstName: {
@@ -37,6 +38,7 @@ const stakeholderSchema = new Schema<TStakeHolder>(
       ref: 'User',
     },
     name: stakeholderNameSchema,
+    slug: { type: String },
     email: { type: String, unique: true, required: true },
     phone: { type: String, unique: true, required: true },
     nid: { type: String, unique: true, required: true },
@@ -66,6 +68,14 @@ const stakeholderSchema = new Schema<TStakeHolder>(
 
 stakeholderSchema.virtual('fullName').get(function (this: TStakeHolder) {
   return `${this.name.firstName} ${this.name.middleName} ${this.name.lastName}`;
+});
+
+stakeholderSchema.pre('save', function (next) {
+  if (this.isModified('name')) {
+    const fullName = `${this.name.firstName} ${this.name.middleName || ''} ${this.name.lastName}`;
+    this.slug = slugify(fullName.trim(), { lower: true, strict: true });
+  }
+  next();
 });
 
 export const Stakeholder = model<TStakeHolder>(

@@ -16,6 +16,7 @@ const sellerSchema = new Schema<TSeller>(
       middleName: { type: String },
       lastName: { type: String, required: true },
     },
+    slug: { type: String },
     email: {
       type: String,
       unique: true,
@@ -65,11 +66,12 @@ sellerSchema.virtual('fullName').get(function () {
   return `${this?.name?.firstName} ${this?.name?.middleName} ${this?.name?.lastName}`;
 });
 
-// sellerSchema.pre('save', function (next) {
-//   if (this.isModified('fullName')) {
-//     this.slug = slugify(this.title, { lower: true, strict: true });
-//   }
-//   next();
-// });
+sellerSchema.pre('save', function (next) {
+  if (this.isModified('name')) {
+    const fullName = `${this.name.firstName} ${this.name.middleName || ''} ${this.name.lastName}`;
+    this.slug = slugify(fullName.trim(), { lower: true, strict: true });
+  }
+  next();
+});
 
 export const Seller = model<TSeller>('Seller', sellerSchema);

@@ -15,6 +15,7 @@ export type TStakeHolderName = {
 export type TStakeHolder = {
   userId: Types.ObjectId;
   name: TStakeHolderName;
+  slug?: string;
   email: string;
   phone: string;
   nid: string;
