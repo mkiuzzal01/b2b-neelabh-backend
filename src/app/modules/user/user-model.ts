@@ -1,10 +1,10 @@
 import { model, Schema } from 'mongoose';
-import { TBankAccountInfo, TUser } from './user-interface';
+import { TBankAccountInfo, TUser, UserModel } from './user-interface';
 import { profileStatus } from './user-constant';
 import bcrypt from 'bcrypt';
 import config from '../../config';
 
-const userSchema = new Schema<TUser>(
+const userSchema = new Schema<TUser, UserModel>(
   {
     email: {
       type: String,
@@ -27,7 +27,10 @@ const userSchema = new Schema<TUser>(
     },
     isPasswordChanged: {
       type: Boolean,
-      default: false,
+      default: true,
+    },
+    passwordChangeAt: {
+      type: Date,
     },
     isDeleted: {
       type: Boolean,
@@ -53,7 +56,28 @@ userSchema.post('save', function (doc, next) {
   next();
 });
 
-export const User = model<TUser>('User', userSchema);
+userSchema.statics.isUserExistByCustomField = async function (email: string) {
+  return await User.findOne({ email }).select('+password');
+};
+
+//check password is match:
+userSchema.statics.isPasswordMatch = async function (
+  plaintextPassword,
+  hashedPassword,
+) {
+  return await bcrypt.compare(plaintextPassword, hashedPassword);
+};
+
+//check password change time and jwt token issue time:
+userSchema.statics.isJwtIssuedBeforePasswordChange = async function (
+  passwordChangeTime: Date,
+  tokenIssuedTime: number,
+) {
+  const passChangeTime = passwordChangeTime?.getTime() / 1000;
+  return passChangeTime > tokenIssuedTime;
+};
+
+export const User = model<TUser, UserModel>('User', userSchema);
 
 //for bank account info:
 const bankAccountInfoSchema = new Schema<TBankAccountInfo>(

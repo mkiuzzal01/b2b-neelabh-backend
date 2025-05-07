@@ -8,7 +8,7 @@ import { TStakeHolder } from '../stake-holder/stakeholder-interface';
 import AppError from '../../errors/AppError';
 import status from 'http-status';
 import { Seller } from '../seller/seller-model';
-import { TRole } from '../../interface/TRole';
+import { TRole } from '../../interface/AccessRole';
 import { TProduct } from '../product/product.interface';
 import { Product } from '../product/product.model';
 import {

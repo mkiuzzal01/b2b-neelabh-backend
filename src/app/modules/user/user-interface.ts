@@ -1,18 +1,22 @@
-import { Types } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { TProfileStatus } from '../../interface/TProfileStatus';
-import { TRole } from '../../interface/TRole';
 import { TPaymentMethod } from '../../interface/TPaymentMethod';
 import { TBankName } from '../../interface/TBankName';
 import { TAccountStatus } from '../../interface/TAccountStatus';
+import { ACCESS_ROLE } from '../../interface/AccessRole';
 
-export type TUser = {
+export type TRole = (typeof ACCESS_ROLE)[keyof typeof ACCESS_ROLE];
+
+export interface TUser {
+  _id?: string;
   email: string;
   role: TRole;
   status: TProfileStatus;
   password: string;
   isPasswordChanged: boolean;
+  passwordChangeAt?: Date;
   isDeleted: boolean;
-};
+}
 
 export type TBankAccountInfo = {
   userId: Types.ObjectId;
@@ -23,3 +27,16 @@ export type TBankAccountInfo = {
   balance: number;
   status: TAccountStatus;
 };
+
+export interface UserModel extends Model<TUser> {
+  isUserExistByCustomField(email: string): Promise<TUser>;
+  isPasswordMatch(
+    plaintextPassword: string,
+    hashedPassword: string,
+  ): Promise<boolean>;
+
+  isJwtIssuedBeforePasswordChange(
+    passwordChangeTime: Date,
+    tokenIssuedTime: number,
+  ): Promise<boolean>;
+}

@@ -4,5 +4,5 @@ export const role = [
   'admin',
   'seller',
   'productManager',
-  'Accountant',
+  'accountant',
 ] as const;
