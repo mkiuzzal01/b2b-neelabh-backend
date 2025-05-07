@@ -7,10 +7,12 @@ import status from 'http-status';
 export const createStackHolder: RequestHandler = catchAsync(
   async (req: Request, res: Response) => {
     const { password, role, stakeholder } = req.body;
+    const creator = req.user.id;
     const result = await userService.createStackHolderBD(
       password,
       role,
       stakeholder,
+      creator,
     );
     sendResponse(res, {
       statusCode: status.OK,

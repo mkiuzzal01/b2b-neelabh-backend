@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import mongoose from 'mongoose';
-import { TBankAccountInfo, TUser } from './user-interface';
+import { TBankAccountInfo, TRole, TUser } from './user-interface';
 import config from '../../config';
 import { BankAccount, User } from './user-model';
 import { Stakeholder } from '../stake-holder/stakeholder-model';
@@ -8,7 +9,6 @@ import { TStakeHolder } from '../stake-holder/stakeholder-interface';
 import AppError from '../../errors/AppError';
 import status from 'http-status';
 import { Seller } from '../seller/seller-model';
-import { TRole } from '../../interface/AccessRole';
 import { TProduct } from '../product/product.interface';
 import { Product } from '../product/product.model';
 import {
@@ -21,6 +21,7 @@ const createStackHolderBD = async (
   password: string,
   role: TRole,
   payload: TStakeHolder,
+  creator: string,
 ) => {
   const session = await mongoose.startSession();
   session.startTransaction();
@@ -39,7 +40,9 @@ const createStackHolderBD = async (
     }
 
     //create the stakeholder:
-    payload.userId = newUser[0]._id;
+    payload.userId = newUser[0]._id as any;
+    payload.creatorId = creator;
+
     const newAdmin = await Stakeholder.create([payload], { session });
     if (!newAdmin.length) {
       throw new AppError(status.BAD_REQUEST, 'Failed to create admin');
@@ -56,7 +59,11 @@ const createStackHolderBD = async (
   }
 };
 
-const createSellerIntoBD = async (password: string, payload: TSeller) => {
+const createSellerIntoBD = async (
+  password: string,
+  payload: TSeller,
+  creator: string,
+) => {
   const session = await mongoose.startSession();
   session.startTransaction();
 
@@ -77,7 +84,7 @@ const createSellerIntoBD = async (password: string, payload: TSeller) => {
 
     //create the bank account:
     const bankAccountPayload: Partial<TBankAccountInfo> = {
-      userId: createdUser._id,
+      userId: createdUser._id as any,
       ...payload.bankAccountInfo,
     };
 
@@ -91,8 +98,9 @@ const createSellerIntoBD = async (password: string, payload: TSeller) => {
     const createdBankAccount = newBankAccount[0];
 
     //create the seller:
-    payload.userId = createdUser._id;
+    payload.userId = createdUser._id as any;
     payload.bankAccountInfo = createdBankAccount._id;
+    payload.creatorId = creator;
 
     const newSeller = await Seller.create([payload], { session });
     if (!newSeller.length) {
@@ -110,7 +118,7 @@ const createSellerIntoBD = async (password: string, payload: TSeller) => {
   }
 };
 
-const createProductIntoBD = async (payload: TProduct) => {
+const createProductIntoBD = async (payload: TProduct, creatorId: string) => {
   const session = await mongoose.startSession();
   session.startTransaction();
 
@@ -145,6 +153,8 @@ const createProductIntoBD = async (payload: TProduct) => {
     if (!isExitsSubCategory) {
       throw new AppError(status.NOT_FOUND, 'The sub category not found');
     }
+
+    payload.creatorId = creatorId;
 
     const newProduct = await Product.create([payload], { session });
     if (!newProduct.length) {

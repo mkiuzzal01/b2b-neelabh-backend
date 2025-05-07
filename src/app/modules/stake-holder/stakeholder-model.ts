@@ -31,6 +31,9 @@ const stakeholderNameSchema = new Schema<TStakeHolderName>({
 
 const stakeholderSchema = new Schema<TStakeHolder>(
   {
+    creatorId: {
+      type: String,
+    },
     userId: {
       type: Schema.Types.ObjectId,
       required: [true, 'User ID is required'],

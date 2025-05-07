@@ -13,7 +13,8 @@ export type TStakeHolderName = {
 };
 
 export type TStakeHolder = {
-  userId: Types.ObjectId;
+  creatorId?: string;
+  userId?: Types.ObjectId;
   name: TStakeHolderName;
   slug?: string;
   email: string;

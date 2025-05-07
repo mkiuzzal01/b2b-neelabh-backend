@@ -13,6 +13,7 @@ export type TName = {
 };
 
 export type TSeller = {
+  creatorId?: string;
   userId: Types.ObjectId;
   name: TName;
   slug?: string;

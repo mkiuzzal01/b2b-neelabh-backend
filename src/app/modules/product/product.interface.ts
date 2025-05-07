@@ -18,6 +18,7 @@ export type TCategories = {
 };
 
 export type TProduct = {
+  creatorId?: string;
   productCode: string;
   title: string;
   slug?: string;
