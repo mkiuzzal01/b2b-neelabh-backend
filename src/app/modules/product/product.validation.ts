@@ -3,7 +3,7 @@ import { productStatus, productActivity } from './product.constant';
 
 const productAttributeSchema = z.object({
   value: z.string().min(1, 'Attribute value is required'),
-  quantity: z.number().min(0, 'Quantity must be at least 0'),
+  quantity: z.number().min(0, 'Quantity must be at least 0').optional(),
 });
 
 const productVariantSchema = z.object({

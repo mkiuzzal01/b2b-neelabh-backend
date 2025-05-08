@@ -6,7 +6,11 @@ import status from 'http-status';
 
 const createRequisition: RequestHandler = catchAsync(async (req, res) => {
   const data = req.body;
-  const result = await requisitionService.createRequisitionIntoDB(data);
+  const creatorId = req.user.id;
+  const result = await requisitionService.createRequisitionIntoDB(
+    data,
+    creatorId,
+  );
   sendResponse(res, {
     statusCode: status.OK,
     success: true,
@@ -67,7 +71,8 @@ export const requisitionController = {
 
 const createFeedback = catchAsync(async (req, res) => {
   const data = req.body;
-  const result = await feedbackServices.createFeedbackIntoDB(data);
+  const creatorId = req.user.id;
+  const result = await feedbackServices.createFeedbackIntoDB(data, creatorId);
   sendResponse(res, {
     statusCode: status.OK,
     success: true,

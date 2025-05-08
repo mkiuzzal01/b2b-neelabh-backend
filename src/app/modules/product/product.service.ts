@@ -82,7 +82,7 @@ const createProductIntoBD = async (payload: TProduct, creatorId: string) => {
       }
     }
 
-    payload.creatorId = creatorId;
+    payload.creatorId = new mongoose.Types.ObjectId(creatorId);
 
     const newProduct = await Product.create([payload], { session });
     if (!newProduct.length) {

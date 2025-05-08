@@ -1,9 +1,9 @@
 import { model, Schema } from 'mongoose';
-import { TProduct } from './product.interface';
+import { TCategories, TProduct, TProductVariant } from './product.interface';
 import { productActivity, productStatus } from './product.constant';
 import slugify from 'slugify';
 
-export const categoriesSchema = {
+export const categoriesSchema = new Schema<TCategories>({
   mainCategory: {
     type: Schema.Types.ObjectId,
     ref: 'MainCategory',
@@ -19,15 +19,15 @@ export const categoriesSchema = {
     ref: 'SubCategory',
     required: true,
   },
-};
+});
 
-export const variantSchema = new Schema(
+export const variantSchema = new Schema<TProductVariant>(
   {
     name: { type: String, required: true },
     attributes: [
       {
         value: { type: String, required: true },
-        quantity: { type: Number, required: true },
+        quantity: { type: Number },
       },
     ],
   },
@@ -36,8 +36,8 @@ export const variantSchema = new Schema(
 
 const productSchema = new Schema<TProduct>(
   {
+    creatorId: { type: Schema.Types.ObjectId, ref: 'User' },
     productCode: { type: String, unique: true, required: true },
-    creatorId: { type: String },
     title: { type: String, required: true },
     slug: { type: String },
     subTitle: { type: String },

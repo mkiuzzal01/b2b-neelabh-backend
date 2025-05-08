@@ -2,7 +2,6 @@ import { Feedback, Requisition } from './requisition.model';
 import { TFeedback, TRequisition } from './requisition.interface';
 import AppError from '../../errors/AppError';
 import status from 'http-status';
-import { User } from '../user/user-model';
 import mongoose from 'mongoose';
 
 const allRequisitionFromDB = async () => {
@@ -13,12 +12,12 @@ const singleRequisitionFromDB = async (id: string) => {
   const result = await Requisition.findById(id).populate('feedbackId');
   return result;
 };
-const createRequisitionIntoDB = async (payload: TRequisition) => {
-  const isExistUser = await User.findById({ _id: payload.creatorId });
 
-  if (!isExistUser) {
-    throw new AppError(status.NOT_FOUND, 'This is user not found');
-  }
+const createRequisitionIntoDB = async (
+  payload: TRequisition,
+  creatorId: string,
+) => {
+  payload.creatorId = new mongoose.Types.ObjectId(creatorId);
   const result = await Requisition.create(payload);
   return result;
 };
@@ -49,6 +48,7 @@ export const requisitionService = {
   singleRequisitionFromDB,
   deleteRequisitionFrom,
 };
+
 //feedback:
 
 const allFeedbackFromDB = async () => {
@@ -77,7 +77,7 @@ const updateFeedbackIntoDB = async (
   });
   return result;
 };
-const createFeedbackIntoDB = async (payload: TFeedback) => {
+const createFeedbackIntoDB = async (payload: TFeedback, creatorId: string) => {
   const session = await mongoose.startSession();
 
   try {
@@ -90,10 +90,7 @@ const createFeedbackIntoDB = async (payload: TFeedback) => {
       throw new AppError(status.NOT_FOUND, 'Requisition not found');
     }
 
-    const isExistUser = await User.findById(payload.creatorId).session(session);
-    if (!isExistUser) {
-      throw new AppError(status.NOT_FOUND, 'User not found');
-    }
+    payload.creatorId = new mongoose.Types.ObjectId(creatorId);
 
     const feedback = await Feedback.create([payload], { session });
     if (!feedback.length) {

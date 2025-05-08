@@ -18,7 +18,7 @@ export type TCategories = {
 };
 
 export type TProduct = {
-  creatorId?: string;
+  creatorId?: Types.ObjectId;
   productCode: string;
   title: string;
   slug?: string;

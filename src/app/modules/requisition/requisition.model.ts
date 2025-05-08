@@ -5,7 +5,7 @@ import slugify from 'slugify';
 
 const requisitionSchema = new Schema<TRequisition>(
   {
-    creatorId: { type: Schema.Types.ObjectId, required: true, ref: 'User' },
+    creatorId: { type: Schema.Types.ObjectId, ref: 'User' },
     title: { type: String, required: true },
     slug: { type: String },
     subTitle: { type: String },
