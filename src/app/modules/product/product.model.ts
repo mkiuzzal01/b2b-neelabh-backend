@@ -37,6 +37,7 @@ export const variantSchema = new Schema(
 const productSchema = new Schema<TProduct>(
   {
     productCode: { type: String, unique: true, required: true },
+    creatorId: { type: String },
     title: { type: String, required: true },
     slug: { type: String },
     subTitle: { type: String },
@@ -66,8 +67,15 @@ const productSchema = new Schema<TProduct>(
 
 productSchema.pre('save', function (next) {
   if (this.isModified('title')) {
-    this.slug = slugify(this.title, { lower: true, strict: true });
+    const slugText = this.title + this.subTitle;
+    this.slug = slugify(slugText, { lower: true, strict: true });
   }
+  next();
+});
+
+variantSchema.pre('save', function (next) {
+  this.name.toLocaleLowerCase();
+  this.attributes.map((val) => val.value.toLocaleLowerCase());
   next();
 });
 

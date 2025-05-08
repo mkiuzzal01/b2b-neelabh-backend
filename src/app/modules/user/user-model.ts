@@ -27,7 +27,7 @@ const userSchema = new Schema<TUser, UserModel>(
     },
     isPasswordChanged: {
       type: Boolean,
-      default: true,
+      default: false,
     },
     passwordChangeAt: {
       type: Date,

@@ -4,6 +4,18 @@ import { productService } from './product.service';
 import sendResponse from '../utils/sendResponse';
 import status from 'http-status';
 
+const createProduct: RequestHandler = catchAsync(async (req, res) => {
+  const product = req.body;
+  const creator = req.user.id;
+  const result = await productService.createProductIntoBD(product, creator);
+  sendResponse(res, {
+    statusCode: status.OK,
+    success: true,
+    message: 'Product created successfully',
+    data: result,
+  });
+});
+
 const updateProduct: RequestHandler = catchAsync(async (req, res) => {
   const id = req.params.id;
   const data = req.body;
@@ -47,6 +59,7 @@ const deleteProduct: RequestHandler = catchAsync(async (req, res) => {
 });
 
 export const productController = {
+  createProduct,
   updateProduct,
   getAllProduct,
   getSingleProduct,

@@ -5,9 +5,9 @@ import config from '../config';
 import catchAsync from '../modules/utils/catchAsync';
 import { User } from '../modules/user/user-model';
 import jwt, { JwtPayload } from 'jsonwebtoken';
-import { TUserRole } from '../modules/auth/auth.constant';
+import { TRole } from '../modules/user/user-interface';
 
-export const auth = (...requiredRole: TUserRole[]) => {
+export const auth = (...requiredRole: TRole[]) => {
   return catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const token = req.headers.authorization;
 
@@ -24,7 +24,7 @@ export const auth = (...requiredRole: TUserRole[]) => {
     //verification of role and authorization :
     const { role, id, iat } = decoded;
 
-    const isUserExist = await User.findById(id);
+    const isUserExist = await User.findById({ _id: id });
 
     if (!isUserExist) {
       throw new AppError(status.NOT_FOUND, 'User not found');

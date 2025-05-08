@@ -4,7 +4,7 @@ import { userService } from './user-service';
 import catchAsync from '../utils/catchAsync';
 import status from 'http-status';
 
-export const createStackHolder: RequestHandler = catchAsync(
+const createStackHolder: RequestHandler = catchAsync(
   async (req: Request, res: Response) => {
     const { password, role, stakeholder } = req.body;
     const creator = req.user.id;
@@ -23,10 +23,15 @@ export const createStackHolder: RequestHandler = catchAsync(
   },
 );
 
-export const createSeller: RequestHandler = catchAsync(
+const createSeller: RequestHandler = catchAsync(
   async (req: Request, res: Response) => {
     const { password, seller } = req.body;
-    const result = await userService.createSellerIntoBD(password, seller);
+    const creator = req.user.id;
+    const result = await userService.createSellerIntoBD(
+      password,
+      seller,
+      creator,
+    );
     sendResponse(res, {
       statusCode: status.OK,
       success: true,
@@ -36,21 +41,7 @@ export const createSeller: RequestHandler = catchAsync(
   },
 );
 
-export const createProduct: RequestHandler = catchAsync(
-  async (req: Request, res: Response) => {
-    const product = req.body;
-    const result = await userService.createProductIntoBD(product);
-    sendResponse(res, {
-      statusCode: status.OK,
-      success: true,
-      message: 'Product created successfully',
-      data: result,
-    });
-  },
-);
-
 export const userController = {
   createStackHolder,
   createSeller,
-  createProduct,
 };

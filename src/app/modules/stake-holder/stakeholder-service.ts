@@ -16,6 +16,7 @@ const getSingleStakeholderFromDB = async (id: string) => {
   }
   return result;
 };
+
 const updateStakeholderIntoDB = async (
   id: string,
   payload: Partial<TStakeHolder>,

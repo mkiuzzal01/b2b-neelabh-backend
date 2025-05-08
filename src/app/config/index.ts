@@ -10,4 +10,6 @@ export default {
   bcrypt_salt_rounds: process.env.BCRYPT_SALT_ROUNDS,
   node_env: process.env.NODE_ENV,
   access_token_secret: process.env.JWT_ACCESS_TOKEN,
+  super_admin_email: process.env.SUPER_ADMIN_EMAIL,
+  super_admin_pass: process.env.SUPER_ADMIN_PASS,
 };
