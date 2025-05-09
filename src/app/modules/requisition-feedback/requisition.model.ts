@@ -32,7 +32,8 @@ const requisitionSchema = new Schema<TRequisition>(
 
 requisitionSchema.pre('save', function (next) {
   if (this.isModified('title')) {
-    this.slug = slugify(this.title, { lower: true, strict: true });
+    const slugText = this.title + this.subTitle;
+    this.slug = slugify(slugText, { lower: true, strict: true });
   }
   next();
 });

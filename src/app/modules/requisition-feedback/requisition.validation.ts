@@ -23,7 +23,6 @@ export const updateRequisitionValidationSchema = z.object({
 
 export const createFeedbackValidationSchema = z.object({
   body: z.object({
-    creatorId: z.string(),
     requisitionId: z.string(),
     description: z.string(),
   }),

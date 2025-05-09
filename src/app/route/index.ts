@@ -9,7 +9,7 @@ import { noticeRouter } from '../modules/notice/notice.route';
 import {
   feedbackRouter,
   requisitionRouter,
-} from '../modules/requisition/requisition.route';
+} from '../modules/requisition-feedback/requisition.route';
 import { authRouter } from '../modules/auth/auth.route';
 
 const router = Router();

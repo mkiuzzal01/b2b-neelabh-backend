@@ -6,10 +6,11 @@ import status from 'http-status';
 
 const createRequisition: RequestHandler = catchAsync(async (req, res) => {
   const data = req.body;
-  const creatorId = req.user.id;
+  const creatorId = req.user;
+  console.log(creatorId);
   const result = await requisitionService.createRequisitionIntoDB(
     data,
-    creatorId,
+    // creatorId,
   );
   sendResponse(res, {
     statusCode: status.OK,

@@ -17,7 +17,8 @@ const createRequisitionIntoDB = async (
   payload: TRequisition,
   creatorId: string,
 ) => {
-  payload.creatorId = new mongoose.Types.ObjectId(creatorId);
+  const ObjectId = new mongoose.Types.ObjectId(creatorId);
+  payload.creatorId = ObjectId;
   const result = await Requisition.create(payload);
   return result;
 };
@@ -37,8 +38,8 @@ const updateRequisitionIntoDB = async (
   return result;
 };
 const deleteRequisitionFrom = async (id: string) => {
-  const result = await Requisition.findByIdAndDelete(id);
-  return result;
+  await Requisition.findByIdAndDelete(id);
+  return null;
 };
 
 export const requisitionService = {
@@ -117,8 +118,21 @@ const createFeedbackIntoDB = async (payload: TFeedback, creatorId: string) => {
   }
 };
 const deleteFeedbackFromDB = async (id: string) => {
-  const result = await Feedback.findByIdAndDelete(id);
-  return result;
+  const isExistFeedback = await Feedback.findById(id);
+  if (!isExistFeedback) {
+    throw new AppError(status.NOT_FOUND, 'The feedback not found');
+  }
+
+  await Requisition.findOneAndUpdate(
+    isExistFeedback.requisitionId,
+    { feedbackId: null },
+    {
+      new: true,
+      runValidators: true,
+    },
+  );
+  await Feedback.findByIdAndDelete(id);
+  return null;
 };
 
 export const feedbackServices = {
