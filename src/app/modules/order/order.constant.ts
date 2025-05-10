@@ -1,0 +1,12 @@
+export const orderStatus = [
+  'PENDING',
+  'PROCESSING',
+  'READY_FOR_PICKUP',
+  'DISPATCHED',
+  'OUT_FOR_DELIVERY',
+  'DELIVERED',
+  'DELIVERY_FAILED',
+  'RETURN_REQUESTED',
+  'RETURNED',
+  'CANCELLED',
+] as const;

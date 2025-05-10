@@ -11,6 +11,7 @@ import {
   requisitionRouter,
 } from '../modules/requisition-feedback/requisition.route';
 import { authRouter } from '../modules/auth/auth.route';
+import { orderRoute } from '../modules/order/order.route';
 
 const router = Router();
 
@@ -54,6 +55,10 @@ const routeModule = [
   {
     path: '/auth',
     route: authRouter,
+  },
+  {
+    path: '/order',
+    route: orderRoute,
   },
 ];
 
