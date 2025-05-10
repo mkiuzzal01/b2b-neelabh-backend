@@ -3,23 +3,26 @@ import { TCategories, TProduct, TProductVariant } from './product.interface';
 import { productActivity, productStatus } from './product.constant';
 import slugify from 'slugify';
 
-export const categoriesSchema = new Schema<TCategories>({
-  mainCategory: {
-    type: Schema.Types.ObjectId,
-    ref: 'MainCategory',
-    required: true,
+export const categoriesSchema = new Schema<TCategories>(
+  {
+    mainCategory: {
+      type: Schema.Types.ObjectId,
+      ref: 'MainCategory',
+      required: true,
+    },
+    category: {
+      type: Schema.Types.ObjectId,
+      ref: 'Category',
+      required: true,
+    },
+    subCategory: {
+      type: Schema.Types.ObjectId,
+      ref: 'SubCategory',
+      required: true,
+    },
   },
-  category: {
-    type: Schema.Types.ObjectId,
-    ref: 'Category',
-    required: true,
-  },
-  subCategory: {
-    type: Schema.Types.ObjectId,
-    ref: 'SubCategory',
-    required: true,
-  },
-});
+  { _id: false },
+);
 
 export const variantSchema = new Schema<TProductVariant>(
   {
@@ -41,6 +44,10 @@ const productSchema = new Schema<TProduct>(
     title: { type: String, required: true },
     slug: { type: String },
     subTitle: { type: String },
+    totalQuantity: {
+      type: Number,
+      required: true,
+    },
     variants: [variantSchema],
     price: { type: Number, required: true },
     discount: { type: Number, required: true },
@@ -67,7 +74,7 @@ const productSchema = new Schema<TProduct>(
 
 productSchema.pre('save', function (next) {
   if (this.isModified('title')) {
-    const slugText = this.title + this.subTitle;
+    const slugText = this.title + this._id + this.price + this.subTitle + this;
     this.slug = slugify(slugText, { lower: true, strict: true });
   }
   next();

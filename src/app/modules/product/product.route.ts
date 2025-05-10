@@ -11,7 +11,7 @@ router.get('/all-product', productController.getAllProduct);
 router.get('/single-product/:id', productController.getSingleProduct);
 router.post(
   '/create-product',
-  auth(ACCESS_ROLE.SUPER_ADMIN, ACCESS_ROLE.ADMIN),
+  auth(ACCESS_ROLE.SUPER_ADMIN, ACCESS_ROLE.ADMIN, ACCESS_ROLE.SELLER),
   validationRequest(productValidation.createProductValidationSchema),
   productController.createProduct,
 );

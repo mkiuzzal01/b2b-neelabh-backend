@@ -12,91 +12,74 @@ import { ProductVariant } from '../product-variant/product-variant-model';
 
 const createProductIntoBD = async (payload: TProduct, creatorId: string) => {
   const session = await mongoose.startSession();
-  session.startTransaction();
 
   try {
-    const isExitsProduct = await Product.findOne({
-      productCode: payload.productCode,
-    });
+    return await session.withTransaction(async () => {
+      const [existingProduct, mainCat, cat, subCat] = await Promise.all([
+        Product.findOne({ productCode: payload.productCode }).session(session),
+        MainCategory.findById(payload.categories.mainCategory).session(session),
+        Category.findById(payload.categories.category).session(session),
+        SubCategory.findById(payload.categories.subCategory).session(session),
+      ]);
 
-    if (isExitsProduct) {
-      throw new AppError(status.CONFLICT, 'The products code already exits');
-    }
-
-    const isExistMainCategory = await MainCategory.findById({
-      _id: payload.categories.mainCategory,
-    });
-
-    if (!isExistMainCategory) {
-      throw new AppError(status.NOT_FOUND, 'The main category not found');
-    }
-
-    const isExistCategory = await Category.findById({
-      _id: payload.categories.category,
-    });
-    if (!isExistCategory) {
-      throw new AppError(status.NOT_FOUND, 'The category not found');
-    }
-
-    const isExitsSubCategory = await SubCategory.findById({
-      _id: payload.categories.subCategory,
-    });
-
-    if (!isExitsSubCategory) {
-      throw new AppError(status.NOT_FOUND, 'The sub category not found');
-    }
-
-    //create or update variant:
-    for (const variant of payload.variants) {
-      const variantName = variant.name.toLowerCase();
-
-      // Normalize attribute values
-      const incomingAttributes = variant.attributes.map((attr) => ({
-        value: attr.value.toLowerCase(),
-      }));
-
-      const existing = await ProductVariant.findOne({ name: variantName });
-
-      if (existing) {
-        const existingValues = existing.attributes.map((attr) => attr.value);
-        const newAttributes = incomingAttributes.filter(
-          (attr) => !existingValues.includes(attr.value),
-        );
-
-        if (newAttributes.length > 0) {
-          await ProductVariant.updateOne(
-            { name: variantName },
-            {
-              $addToSet: {
-                attributes: { $each: newAttributes },
-              },
-            },
-          );
-        }
-      } else {
-        // Create new variant
-        await ProductVariant.create({
-          name: variantName,
-          attributes: incomingAttributes,
-        });
+      if (existingProduct) {
+        throw new AppError(status.CONFLICT, 'Product code already exists');
       }
-    }
+      if (!mainCat) {
+        throw new AppError(status.NOT_FOUND, 'Main category not found');
+      }
+      if (!cat) {
+        throw new AppError(status.NOT_FOUND, 'Category not found');
+      }
+      if (!subCat) {
+        throw new AppError(status.NOT_FOUND, 'Sub-category not found');
+      }
 
-    payload.creatorId = new mongoose.Types.ObjectId(creatorId);
+      const sumOfVariants = payload.variants.reduce(
+        (sum, v) =>
+          sum + v.attributes.reduce((s2, attr) => s2 + (attr.quantity ?? 0), 0),
+        0,
+      );
 
-    const newProduct = await Product.create([payload], { session });
-    if (!newProduct.length) {
-      throw new AppError(status.BAD_REQUEST, 'Failed to create product');
-    }
+      if (sumOfVariants !== payload.totalQuantity) {
+        throw new AppError(
+          status.BAD_REQUEST,
+          'The product variant and quantities not equal',
+        );
+      }
 
-    await session.commitTransaction();
+      const bulkOps = payload.variants.map((variant) => {
+        const name = variant.name.toLowerCase();
+        const attrs = variant.attributes.map((a) => ({
+          value: a.value.toLowerCase(),
+        }));
+
+        return {
+          updateOne: {
+            filter: { name },
+            update: {
+              $setOnInsert: { name },
+              $addToSet: { attributes: { $each: attrs } },
+            },
+            upsert: true,
+          },
+        };
+      });
+
+      if (bulkOps.length) {
+        await ProductVariant.bulkWrite(bulkOps, { session });
+      }
+
+      const product = new Product({
+        ...payload,
+        creatorId: new mongoose.Types.ObjectId(creatorId),
+      });
+      await product.save({ session });
+
+      return product;
+    });
+  } finally {
     session.endSession();
-
-    return newProduct[0];
-  } catch (error) {
-    await session.abortTransaction();
-    session.endSession();
-    throw error;
   }
 };
 
@@ -128,6 +111,21 @@ const updateProductIntoBD = async (id: string, payload: Partial<TProduct>) => {
 
   if (!isExitsSubCategory) {
     throw new AppError(status.NOT_FOUND, 'The sub category not found');
+  }
+
+  if (payload.variants && payload.totalQuantity) {
+    const sumOfVariants = payload.variants.reduce(
+      (sum, v) =>
+        sum + v.attributes.reduce((s2, attr) => s2 + (attr.quantity ?? 0), 0),
+      0,
+    );
+
+    if (sumOfVariants !== payload.totalQuantity) {
+      throw new AppError(
+        status.BAD_REQUEST,
+        'The product variant and quantities not equal',
+      );
+    }
   }
 
   const result = await Product.findByIdAndUpdate({ _id: id }, payload, {

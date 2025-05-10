@@ -22,6 +22,7 @@ const categoriesSchema = z.object({
 const baseProductSchema = z.object({
   productCode: z.string().min(1, 'Product code is required'),
   title: z.string().min(1, 'Title is required'),
+  totalQuantity: z.number({ required_error: 'Quantity is required' }),
   subTitle: z.string().optional(),
   variants: z
     .array(productVariantSchema)

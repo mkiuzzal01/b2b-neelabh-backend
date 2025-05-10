@@ -21,6 +21,7 @@ export type TProduct = {
   creatorId?: Types.ObjectId;
   productCode: string;
   title: string;
+  totalQuantity: number;
   slug?: string;
   subTitle?: string;
   variants: TProductVariant[];
