@@ -21,6 +21,8 @@ const createOrderIntoDB = async (payload: TOrder, sellerId: string) => {
   if (!isExistProduct) {
     throw new AppError(status.NOT_FOUND, 'The product not found');
   }
+
+  //TODO: Order quantity related issue fix:
   payload.sellerId = new mongoose.Types.ObjectId(sellerId);
   const result = await Order.create(payload);
   return result;
