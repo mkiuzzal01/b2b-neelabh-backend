@@ -9,13 +9,13 @@ const route = Router();
 
 route.get(
   '/all-order',
-  auth(ACCESS_ROLE.SUPER_ADMIN, ACCESS_ROLE.ADMIN),
+  auth(ACCESS_ROLE.SUPER_ADMIN, ACCESS_ROLE.ADMIN, ACCESS_ROLE.SELLER),
   orderController.allOrder,
 );
 
 route.get(
   '/single-order/:id',
-  auth(ACCESS_ROLE.SUPER_ADMIN, ACCESS_ROLE.ADMIN),
+  auth(ACCESS_ROLE.SUPER_ADMIN, ACCESS_ROLE.ADMIN, ACCESS_ROLE.SELLER),
   orderController.singleOrder,
 );
 

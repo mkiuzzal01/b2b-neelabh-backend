@@ -51,11 +51,11 @@ const updateOrder: RequestHandler = catchAsync(async (req, res) => {
 
 const deleteOrder: RequestHandler = catchAsync(async (req, res) => {
   const id = req.params.id;
-  const result = await orderService.singleOrderFromDB(id);
+  const result = await orderService.deleteOrderFromDB(id);
   sendResponse(res, {
     statusCode: status.OK,
     success: true,
-    message: 'The order fetch successfully',
+    message: 'The order delete successfully',
     data: result,
   });
 });

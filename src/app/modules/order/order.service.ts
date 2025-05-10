@@ -53,6 +53,9 @@ const deleteOrderFromDB = async (id: string) => {
       'The order already precessed. so it is not delete',
     );
   }
+
+  await Order.findByIdAndDelete(id);
+  return null;
 };
 
 export const orderService = {
