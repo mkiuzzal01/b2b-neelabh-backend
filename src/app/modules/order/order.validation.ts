@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { orderStatus } from './order.constant';
 
 const productVariantSchema = z.object({
-  name: z.string().min(1, 'Variant name is required'),
+  name: z.string().toLowerCase().min(1, 'Variant name is required'),
   attributes: z
     .array(
       z.object({

@@ -1,5 +1,6 @@
 import { model, Schema } from 'mongoose';
 import { TOrder } from './order.interface';
+import { orderStatus } from './order.constant';
 
 const orderSchema = new Schema<TOrder>(
   {
@@ -34,18 +35,7 @@ const orderSchema = new Schema<TOrder>(
     },
     status: {
       type: String,
-      enum: [
-        'PENDING',
-        'PROCESSING',
-        'READY_FOR_PICKUP',
-        'DISPATCHED',
-        'OUT_FOR_DELIVERY',
-        'DELIVERED',
-        'DELIVERY_FAILED',
-        'RETURN_REQUESTED',
-        'RETURNED',
-        'CANCELLED',
-      ],
+      enum: orderStatus,
       default: 'PENDING',
     },
   },
@@ -53,5 +43,17 @@ const orderSchema = new Schema<TOrder>(
     timestamps: true,
   },
 );
+
+orderSchema.pre('save', function (next) {
+  this.orderVariant = this.orderVariant.map((variant) => ({
+    ...variant,
+    name: variant.name.toLowerCase(),
+    attributes: variant.attributes.map((attr) => ({
+      ...attr,
+      value: attr.value.toLowerCase(),
+    })),
+  }));
+  next();
+});
 
 export const Order = model<TOrder>('Order', orderSchema);
