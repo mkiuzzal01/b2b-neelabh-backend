@@ -10,11 +10,10 @@ const allFolderFromDB = async () => {
 };
 
 const singleFolderFromDB = async (id: string) => {
-  const isExistFolder = await Folder.findById(id);
-  if (!isExistFolder) {
+  const result = await Folder.findById(id);
+  if (!result) {
     throw new AppError(status.NOT_FOUND, 'The folder not found');
   }
-  const result = await Folder.findById(id);
   return result;
 };
 
@@ -24,28 +23,28 @@ const createFolderIntoDB = async (payload: TFolder) => {
 };
 
 const updateFolderIntoDB = async (payload: Partial<TFolder>, id: string) => {
-  const isExistFolder = await Folder.findById(id);
-  if (!isExistFolder) {
-    throw new AppError(status.NOT_FOUND, 'The folder not found');
-  }
   const result = await Folder.findByIdAndUpdate(id, payload, {
     new: true,
     runValidators: true,
   });
 
+  if (!result) {
+    throw new AppError(status.NOT_FOUND, 'The folder not found');
+  }
+
   return result;
 };
 
 const deleteFolderFromDB = async (id: string) => {
-  const isExistFolder = await Folder.findById(id);
-  if (!isExistFolder) {
+  const result = await Folder.findByIdAndDelete(id);
+  if (!result) {
     throw new AppError(status.NOT_FOUND, 'The folder not found');
   }
-  await Folder.findByIdAndDelete(id);
   return null;
 };
 
 //this is for image:
+
 const allPhotoFromDB = async () => {
   const result = await Photo.find();
   return result;
@@ -56,8 +55,7 @@ const singlePhotoFromDB = async (id: string) => {
   if (!isExistPhoto) {
     throw new AppError(status.NOT_FOUND, 'The photo not found');
   }
-  const result = await Photo.findById(id);
-  return result;
+  return isExistPhoto;
 };
 const createPhotoIntoDB = async (payload: TPhoto) => {
   const isExistFolder = await Folder.findById(payload.folderId);
@@ -69,24 +67,24 @@ const createPhotoIntoDB = async (payload: TPhoto) => {
 };
 
 const updatePhotoIntoDB = async (payload: Partial<TPhoto>, id: string) => {
-  const isExistPhoto = await Photo.findById(id);
-  if (!isExistPhoto) {
-    throw new AppError(status.NOT_FOUND, 'The photo not found');
-  }
   const result = await Photo.findByIdAndUpdate(id, payload, {
     new: true,
     runValidators: true,
   });
 
+  if (!result) {
+    throw new AppError(status.NOT_FOUND, 'The photo not found');
+  }
+
   return result;
 };
 
 const deletePhotoFromDB = async (id: string) => {
-  const isExistPhoto = await Photo.findById(id);
-  if (!isExistPhoto) {
+  const result = await Photo.findByIdAndDelete(id);
+  if (!result) {
     throw new AppError(status.NOT_FOUND, 'The photo not found');
   }
-  await Photo.findByIdAndDelete(id);
+
   return null;
 };
 

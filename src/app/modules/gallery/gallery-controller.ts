@@ -75,7 +75,7 @@ const allPhoto: RequestHandler = catchAsync(async (req, res) => {
 
 const singlePhoto: RequestHandler = catchAsync(async (req, res) => {
   const id = req.params.id;
-  const result = await galleryService.singleFolderFromDB(id);
+  const result = await galleryService.singlePhotoFromDB(id);
   sendResponse(res, {
     statusCode: status.OK,
     success: true,
@@ -98,7 +98,7 @@ const createPhoto: RequestHandler = catchAsync(async (req, res) => {
 const updatePhoto: RequestHandler = catchAsync(async (req, res) => {
   const data = req.body;
   const id = req.params.id;
-  const result = await galleryService.updateFolderIntoDB(data, id);
+  const result = await galleryService.updatePhotoIntoDB(data, id);
   sendResponse(res, {
     statusCode: status.OK,
     success: true,
