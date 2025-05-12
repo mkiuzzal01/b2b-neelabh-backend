@@ -1,6 +1,6 @@
 import { model, Schema } from 'mongoose';
 import { TOrder } from './order.interface';
-import { orderStatus } from './order.constant';
+import { orderStatus, paymentStatus } from './order.constant';
 
 const orderSchema = new Schema<TOrder>(
   {
@@ -33,10 +33,25 @@ const orderSchema = new Schema<TOrder>(
       sub_district: { type: String, required: true },
       localArea: { type: String, required: true },
     },
-    status: {
+    totalPrice: {
+      type: Number,
+      default: 0,
+    },
+    orderStatus: {
       type: String,
       enum: orderStatus,
       default: 'PENDING',
+    },
+    transactionId: {
+      type: String,
+    },
+    referenceCode: {
+      type: String,
+    },
+    paymentStatus: {
+      type: String,
+      enum: paymentStatus,
+      default: 'IN-COMPLETE',
     },
   },
   {

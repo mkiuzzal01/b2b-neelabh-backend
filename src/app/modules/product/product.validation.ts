@@ -29,6 +29,7 @@ const baseProductSchema = z.object({
     .min(1, 'At least one variant is required'),
   price: z.number().min(0, 'Price must be greater than or equal to 0'),
   discount: z.number().min(0, 'Discount must be greater than or equal to 0'),
+  parentageForSeller: z.number().min(1, 'Seller percentage is require'),
   rating: z.number().optional(),
   categories: categoriesSchema,
   description: z.string().min(1, 'Description is required'),

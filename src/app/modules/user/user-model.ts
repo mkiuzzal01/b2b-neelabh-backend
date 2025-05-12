@@ -84,6 +84,7 @@ const bankAccountInfoSchema = new Schema<TBankAccountInfo>(
   {
     userId: { type: Schema.Types.ObjectId, required: true, ref: 'User' },
     accountNumber: { type: String, unique: true, required: true },
+    transitionId: { type: String, unique: true },
     paymentMethod: { type: String, required: true },
     bankName: { type: String, required: true },
     balance: { type: Number, default: 0 },

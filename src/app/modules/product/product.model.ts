@@ -26,10 +26,10 @@ export const categoriesSchema = new Schema<TCategories>(
 
 export const variantSchema = new Schema<TProductVariant>(
   {
-    name: { type: String, required: true },
+    name: { type: String, required: true, lowercase: true },
     attributes: [
       {
-        value: { type: String, required: true },
+        value: { type: String, required: true, lowercase: true },
         quantity: { type: Number },
       },
     ],
@@ -51,6 +51,7 @@ const productSchema = new Schema<TProduct>(
     variants: [variantSchema],
     price: { type: Number, required: true },
     discount: { type: Number, required: true },
+    parentageForSeller: { type: Number, required: true, default: 0 },
     rating: { type: Number },
     categories: categoriesSchema,
     description: { type: String, required: true },
@@ -74,15 +75,19 @@ const productSchema = new Schema<TProduct>(
 
 productSchema.pre('save', function (next) {
   if (this.isModified('title')) {
-    const slugText = this.title + this._id + this.price + this.subTitle + this;
+    const slugText = this.title + this.subTitle + this.description;
     this.slug = slugify(slugText, { lower: true, strict: true });
   }
   next();
 });
 
 variantSchema.pre('save', function (next) {
-  this.name.toLocaleLowerCase();
-  this.attributes.map((val) => val.value.toLocaleLowerCase());
+  this.name = this.name.toLowerCase();
+  this.attributes = this.attributes.map((attr) => ({
+    ...attr,
+    value: attr.value.toLowerCase(),
+  }));
+
   next();
 });
 

@@ -20,8 +20,9 @@ export interface TUser {
 
 export type TBankAccountInfo = {
   userId: Types.ObjectId;
-  accountHolderName: string;
   accountNumber: string;
+  transitionId?: string;
+  accountHolderName: string;
   paymentMethod: TPaymentMethod;
   bankName: TBankName;
   balance: number;

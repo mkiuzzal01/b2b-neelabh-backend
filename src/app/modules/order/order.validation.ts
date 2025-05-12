@@ -32,7 +32,7 @@ export const createOrderSchema = z.object({
 
 export const updateOrderSchema = z.object({
   body: z.object({
-    productId: z.string(),
+    productId: z.string().optional(),
     orderVariant: z.array(productVariantSchema).optional(),
     deliveryAddress: deliveryAddressSchema.partial().optional(),
     status: z.enum(orderStatus).optional(),

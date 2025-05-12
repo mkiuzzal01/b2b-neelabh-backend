@@ -27,6 +27,7 @@ export type TProduct = {
   variants: TProductVariant[];
   price: number;
   discount: number;
+  parentageForSeller: number;
   rating?: number;
   categories: TCategories;
   description: string;

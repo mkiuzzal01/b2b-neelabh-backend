@@ -32,7 +32,7 @@ const createOrder: RequestHandler = catchAsync(async (req, res) => {
   sendResponse(res, {
     statusCode: status.OK,
     success: true,
-    message: 'The order fetch successfully',
+    message: 'The order create successfully',
     data: result,
   });
 });
@@ -44,7 +44,7 @@ const updateOrder: RequestHandler = catchAsync(async (req, res) => {
   sendResponse(res, {
     statusCode: status.OK,
     success: true,
-    message: 'The order fetch successfully',
+    message: 'The order update successfully',
     data: result,
   });
 });
