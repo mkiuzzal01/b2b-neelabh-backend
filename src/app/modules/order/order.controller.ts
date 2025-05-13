@@ -49,6 +49,30 @@ const updateOrder: RequestHandler = catchAsync(async (req, res) => {
   });
 });
 
+const changeOrderStatus: RequestHandler = catchAsync(async (req, res) => {
+  const id = req.params.id;
+  const data = req.body;
+  const result = await orderService.changeStatusOfOrderIntoDB(data, id);
+  sendResponse(res, {
+    statusCode: status.OK,
+    success: true,
+    message: 'The status update successfully',
+    data: result,
+  });
+});
+
+const sellerPayment: RequestHandler = catchAsync(async (req, res) => {
+  const id = req.params.id;
+  const data = req.body;
+  const result = await orderService.sellerPaymentIntoDB(data, id);
+  sendResponse(res, {
+    statusCode: status.OK,
+    success: true,
+    message: 'The seller payment successfully',
+    data: result,
+  });
+});
+
 const deleteOrder: RequestHandler = catchAsync(async (req, res) => {
   const id = req.params.id;
   const result = await orderService.deleteOrderFromDB(id);
@@ -65,5 +89,7 @@ export const orderController = {
   singleOrder,
   createOrder,
   updateOrder,
+  changeOrderStatus,
+  sellerPayment,
   deleteOrder,
 };

@@ -48,6 +48,9 @@ const orderSchema = new Schema<TOrder>(
     referenceCode: {
       type: String,
     },
+    sellerProfit: {
+      type: Number,
+    },
     paymentStatus: {
       type: String,
       enum: paymentStatus,

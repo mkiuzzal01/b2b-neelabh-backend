@@ -19,5 +19,6 @@ export type TOrder = {
   orderStatus: TOrderStatus;
   transactionId?: string;
   referenceCode?: string;
+  sellerProfit?: number;
   paymentStatus: TPaymentStatus;
 };

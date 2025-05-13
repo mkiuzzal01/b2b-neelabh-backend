@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { orderStatus } from './order.constant';
+import { orderStatus, paymentStatus } from './order.constant';
 
 const productVariantSchema = z.object({
   name: z.string().toLowerCase().min(1, 'Variant name is required'),
@@ -36,5 +36,19 @@ export const updateOrderSchema = z.object({
     orderVariant: z.array(productVariantSchema).optional(),
     deliveryAddress: deliveryAddressSchema.partial().optional(),
     status: z.enum(orderStatus).optional(),
+  }),
+});
+
+export const changeOrderStatusSchema = z.object({
+  body: z.object({
+    status: z.enum(orderStatus).optional(),
+  }),
+});
+
+export const paymentSellerSchema = z.object({
+  body: z.object({
+    paymentStatus: z.enum(paymentStatus).optional(),
+    transactionId: z.string(),
+    referenceCode: z.string(),
   }),
 });

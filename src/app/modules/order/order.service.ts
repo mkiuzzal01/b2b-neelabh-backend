@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Order } from './order.model';
 import { TOrder } from './order.interface';
 import mongoose from 'mongoose';
@@ -104,7 +105,6 @@ const updateOrderIntoDB = async (payload: Partial<TOrder>, id: string) => {
   }
 
   let totalOrderedQuantity = 0;
-
   if (payload.orderVariant) {
     // Sort and standardize variants
     const sortedVariants = payload.orderVariant
@@ -178,7 +178,22 @@ const updateOrderIntoDB = async (payload: Partial<TOrder>, id: string) => {
     payload.totalPrice = totalPrice;
   }
 
-  //update the product status:
+  const updatedOrder = await Order.findByIdAndUpdate(payload, {
+    new: true,
+    runValidators: true,
+  });
+
+  return updatedOrder;
+};
+
+const changeStatusOfOrderIntoDB = async (
+  payload: Partial<TOrder>,
+  id: string,
+) => {
+  const existingOrder = await Order.findById(id);
+  if (!existingOrder) {
+    throw new AppError(status.NOT_FOUND, 'Order not found');
+  }
   if (
     payload.orderStatus &&
     payload.orderStatus !== existingOrder.orderStatus
@@ -193,8 +208,51 @@ const updateOrderIntoDB = async (payload: Partial<TOrder>, id: string) => {
       );
     }
   }
+  const result = await Order.findByIdAndUpdate({ _id: id }, payload, {
+    new: true,
+    runValidators: true,
+  });
+  return result;
+};
 
-  const updatedOrder = await Order.findByIdAndUpdate(payload, {
+const sellerPaymentIntoDB = async (payload: Partial<TOrder>, id: string) => {
+  const existingOrder = await Order.findById(id).populate('productId');
+
+  if (!existingOrder) {
+    throw new AppError(status.NOT_FOUND, 'Order not found');
+  }
+
+  if (existingOrder.orderStatus !== 'DELIVERED') {
+    throw new AppError(
+      status.BAD_REQUEST,
+      'Product has not been delivered yet',
+    );
+  }
+
+  if (existingOrder.paymentStatus === 'COMPLETED') {
+    throw new AppError(
+      status.BAD_REQUEST,
+      'This product seller payment already complete',
+    );
+  }
+
+  const percentageForSeller =
+    (existingOrder.productId as any).parentageForSeller ?? 0;
+
+  if (typeof percentageForSeller !== 'number' || percentageForSeller <= 0) {
+    throw new AppError(status.BAD_REQUEST, 'Invalid seller percentage');
+  }
+
+  const sellerProfit = Math.round(
+    (existingOrder.totalPrice * percentageForSeller) / 100,
+  );
+
+  payload.referenceCode = existingOrder.referenceCode;
+  payload.transactionId = existingOrder.transactionId;
+  payload.paymentStatus = existingOrder.paymentStatus;
+  payload.sellerProfit = sellerProfit;
+
+  const updatedOrder = await Order.findByIdAndUpdate(id, payload, {
     new: true,
     runValidators: true,
   });
@@ -202,17 +260,12 @@ const updateOrderIntoDB = async (payload: Partial<TOrder>, id: string) => {
   return updatedOrder;
 };
 
-const changeStatusOfOrderIntoDB = async () => {
-  const result = await Order.find({ orderStatus: { $ne: 'CANCELLED' } });
-  return result;
-};
-
 const deleteOrderFromDB = async (id: string) => {
   const isExistOrder = await Order.findById(id);
   if (!isExistOrder) {
     throw new AppError(status.NOT_FOUND, 'The order  not found');
   }
-  if (isExistOrder.status != 'PENDING') {
+  if (isExistOrder.orderStatus != 'PENDING') {
     throw new AppError(
       status.NOT_MODIFIED,
       'The order already precessed. so it is not delete',
@@ -229,5 +282,6 @@ export const orderService = {
   createOrderIntoDB,
   updateOrderIntoDB,
   changeStatusOfOrderIntoDB,
+  sellerPaymentIntoDB,
   deleteOrderFromDB,
 };

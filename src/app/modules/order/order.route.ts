@@ -3,7 +3,12 @@ import { auth } from '../../middlewares/auth';
 import { ACCESS_ROLE } from '../../interface/AccessRole';
 import { orderController } from './order.controller';
 import validationRequest from '../../middlewares/validationRequest';
-import { createOrderSchema, updateOrderSchema } from './order.validation';
+import {
+  changeOrderStatusSchema,
+  createOrderSchema,
+  paymentSellerSchema,
+  updateOrderSchema,
+} from './order.validation';
 
 const route = Router();
 
@@ -31,6 +36,19 @@ route.patch(
   auth(ACCESS_ROLE.SELLER),
   validationRequest(updateOrderSchema),
   orderController.updateOrder,
+);
+
+route.patch(
+  '/change-status/:id',
+  // auth(ACCESS_ROLE.SELLER),
+  validationRequest(changeOrderStatusSchema),
+  orderController.changeOrderStatus,
+);
+
+route.patch(
+  '/seller-pay/:id',
+  validationRequest(paymentSellerSchema),
+  orderController.sellerPayment,
 );
 
 route.delete(
