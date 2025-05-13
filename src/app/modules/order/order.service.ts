@@ -6,6 +6,7 @@ import AppError from '../../errors/AppError';
 import status from 'http-status';
 import { Product } from '../product/product.model';
 import { allowedStatusTransitions } from './order.constant';
+import { BankAccount } from '../user/user-model';
 
 const allOrderFromDB = async () => {
   const result = await Order.find();
@@ -215,8 +216,13 @@ const changeStatusOfOrderIntoDB = async (
   return result;
 };
 
-const sellerPaymentIntoDB = async (payload: Partial<TOrder>, id: string) => {
-  const existingOrder = await Order.findById(id).populate('productId');
+const sellerPaymentIntoDB = async (
+  payload: Partial<TOrder>,
+  orderId: string,
+) => {
+  const existingOrder = await Order.findById(orderId).populate<{
+    productId: TOrder;
+  }>('productId');
 
   if (!existingOrder) {
     throw new AppError(status.NOT_FOUND, 'Order not found');
@@ -230,14 +236,11 @@ const sellerPaymentIntoDB = async (payload: Partial<TOrder>, id: string) => {
   }
 
   if (existingOrder.paymentStatus === 'COMPLETED') {
-    throw new AppError(
-      status.BAD_REQUEST,
-      'This product seller payment already complete',
-    );
+    throw new AppError(status.BAD_REQUEST, 'Seller payment already completed');
   }
 
-  const percentageForSeller =
-    (existingOrder.productId as any).parentageForSeller ?? 0;
+  const percentageForSeller = (existingOrder.productId as any)
+    ?.parentageForSeller;
 
   if (typeof percentageForSeller !== 'number' || percentageForSeller <= 0) {
     throw new AppError(status.BAD_REQUEST, 'Invalid seller percentage');
@@ -249,10 +252,28 @@ const sellerPaymentIntoDB = async (payload: Partial<TOrder>, id: string) => {
 
   payload.referenceCode = existingOrder.referenceCode;
   payload.transactionId = existingOrder.transactionId;
-  payload.paymentStatus = existingOrder.paymentStatus;
+  payload.paymentStatus = 'COMPLETED';
   payload.sellerProfit = sellerProfit;
 
-  const updatedOrder = await Order.findByIdAndUpdate(id, payload, {
+  const sellerId = existingOrder.sellerId?.toString();
+
+  if (!sellerId) {
+    throw new AppError(
+      status.BAD_REQUEST,
+      'Seller information missing from order',
+    );
+  }
+
+  const sellerBankAccount = await BankAccount.findOne({ userId: sellerId });
+
+  if (!sellerBankAccount) {
+    throw new AppError(status.NOT_FOUND, 'Seller bank account not found');
+  }
+
+  sellerBankAccount.balance += sellerProfit;
+  await sellerBankAccount.save();
+
+  const updatedOrder = await Order.findByIdAndUpdate(orderId, payload, {
     new: true,
     runValidators: true,
   });

@@ -3,7 +3,6 @@ import status from 'http-status';
 import AppError from '../../errors/AppError';
 import { Seller } from './seller-model';
 import { TSeller } from './seller-interface';
-import { BankAccountInfo } from '../user/user-model';
 
 const getAllSellersFromDB = async () => {
   const result = await Seller.find()
