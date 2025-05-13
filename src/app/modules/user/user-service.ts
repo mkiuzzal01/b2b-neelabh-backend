@@ -111,7 +111,22 @@ const createSellerIntoBD = async (
   }
 };
 
+const updateUserIntoDB = async (payload: Partial<TUser>, id: string) => {
+  const existingUser = await User.findById(id);
+  if (!existingUser) {
+    throw new AppError(status.NOT_FOUND, 'User not found');
+  }
+
+  const updatedUser = await User.findByIdAndUpdate(id, payload, {
+    new: true,
+    runValidators: true,
+  });
+
+  return updatedUser;
+};
+
 export const userService = {
   createStackHolderBD,
   createSellerIntoBD,
+  updateUserIntoDB,
 };

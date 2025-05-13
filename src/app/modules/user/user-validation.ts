@@ -1,7 +1,7 @@
 import { z } from 'zod';
-import { role } from './user-constant';
+import { profileStatus, role } from './user-constant';
 
-export const userValidationSchema = z.object({
+const createUserValidationSchema = z.object({
   password: z
     .string({
       required_error: 'Password is required',
@@ -13,6 +13,13 @@ export const userValidationSchema = z.object({
   role: z.enum(role, { required_error: 'Role is required' }).optional(),
 });
 
+const updateUserValidationSchema = z.object({
+  body: z.object({
+    status: z.enum(profileStatus, { required_error: 'user status is require' }),
+  }),
+});
+
 export const userValidation = {
-  userValidationSchema,
+  createUserValidationSchema,
+  updateUserValidationSchema,
 };

@@ -1,4 +1,9 @@
-export const profileStatus = ['active', 'inactive', 'blocked', 'leaved'];
+export const profileStatus = [
+  'active',
+  'inactive',
+  'blocked',
+  'leaved',
+] as const;
 export const role = [
   'superAdmin',
   'admin',

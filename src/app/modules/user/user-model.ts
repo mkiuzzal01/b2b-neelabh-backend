@@ -1,6 +1,6 @@
 import { model, Schema } from 'mongoose';
 import { TBankAccountInfo, TUser, UserModel } from './user-interface';
-import { profileStatus } from './user-constant';
+import { profileStatus, role } from './user-constant';
 import bcrypt from 'bcrypt';
 import config from '../../config';
 
@@ -13,6 +13,7 @@ const userSchema = new Schema<TUser, UserModel>(
     },
     role: {
       type: String,
+      enum: role,
       required: true,
     },
     status: {

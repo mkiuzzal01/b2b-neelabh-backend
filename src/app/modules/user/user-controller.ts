@@ -41,7 +41,22 @@ const createSeller: RequestHandler = catchAsync(
   },
 );
 
+const updatedSeller: RequestHandler = catchAsync(
+  async (req: Request, res: Response) => {
+    const creator = req.params.id;
+    const payload = req.body;
+    const result = await userService.updateUserIntoDB(payload, creator);
+    sendResponse(res, {
+      statusCode: status.OK,
+      success: true,
+      message: 'user update successfully',
+      data: result,
+    });
+  },
+);
+
 export const userController = {
   createStackHolder,
   createSeller,
+  updatedSeller,
 };

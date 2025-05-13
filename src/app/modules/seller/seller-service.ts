@@ -3,6 +3,7 @@ import status from 'http-status';
 import AppError from '../../errors/AppError';
 import { Seller } from './seller-model';
 import { TSeller } from './seller-interface';
+import { BankAccount } from '../user/user-model';
 
 const getAllSellersFromDB = async () => {
   const result = await Seller.find()
@@ -66,7 +67,7 @@ const deleteSellerFromDB = async (id: string) => {
     throw new AppError(status.NOT_FOUND, 'this stake holder not found');
   }
 
-  await BankAccountInfo.findOneAndUpdate(
+  await BankAccount.findOneAndUpdate(
     { userId: isExistStakeHolder.userId },
     {
       status: 'deactivate',
