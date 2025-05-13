@@ -5,22 +5,22 @@ import { productValidation } from './product.validation';
 import { ACCESS_ROLE } from '../../interface/AccessRole';
 import { auth } from '../../middlewares/auth';
 
-const router = Router();
+const route = Router();
 
-router.get('/all-product', productController.getAllProduct);
-router.get('/single-product/:id', productController.getSingleProduct);
-router.post(
+route.get('/all-product', productController.getAllProduct);
+route.get('/single-product/:id', productController.getSingleProduct);
+route.post(
   '/create-product',
   auth(ACCESS_ROLE.SUPER_ADMIN, ACCESS_ROLE.ADMIN, ACCESS_ROLE.SELLER),
   validationRequest(productValidation.createProductValidationSchema),
   productController.createProduct,
 );
-router.patch(
+route.patch(
   '/update-product/:id',
   validationRequest(productValidation.updateProductValidationSchema),
   productController.updateProduct,
 );
 
-router.delete('/delete-product/:id', productController.deleteProduct);
+route.delete('/delete-product/:id', productController.deleteProduct);
 
-export const ProductRoute = router;
+export const ProductRoute = route;

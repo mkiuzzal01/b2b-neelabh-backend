@@ -6,11 +6,10 @@ import status from 'http-status';
 
 const createRequisition: RequestHandler = catchAsync(async (req, res) => {
   const data = req.body;
-  const creatorId = req.user;
-  console.log(creatorId);
+  const creator = req.user.id;
   const result = await requisitionService.createRequisitionIntoDB(
     data,
-    // creatorId,
+    creator,
   );
   sendResponse(res, {
     statusCode: status.OK,
@@ -31,7 +30,8 @@ const updateRequisition: RequestHandler = catchAsync(async (req, res) => {
   });
 });
 const allRequisition: RequestHandler = catchAsync(async (req, res) => {
-  const result = await requisitionService.allRequisitionFromDB();
+  const { query } = req;
+  const result = await requisitionService.allRequisitionFromDB(query);
   sendResponse(res, {
     statusCode: status.OK,
     success: true,

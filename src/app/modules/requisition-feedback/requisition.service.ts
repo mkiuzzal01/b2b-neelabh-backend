@@ -3,10 +3,23 @@ import { TFeedback, TRequisition } from './requisition.interface';
 import AppError from '../../errors/AppError';
 import status from 'http-status';
 import mongoose from 'mongoose';
+import QueryBuilder from '../../builder/QueryBuilder';
+import { requisitionSearchableField } from './requisition.constant';
 
-const allRequisitionFromDB = async () => {
-  const result = await Requisition.find().populate('feedbackId');
-  return result;
+const allRequisitionFromDB = async (query: Record<string, unknown>) => {
+  const requisitionQuery = new QueryBuilder(
+    Requisition.find().populate('feedbackId'),
+    query,
+  )
+    .search(requisitionSearchableField)
+    .fields()
+    .filter()
+    .paginate()
+    .sort();
+
+  const meta = await requisitionQuery.countTotal();
+  const result = await requisitionQuery.modelQuery;
+  return { meta, result };
 };
 const singleRequisitionFromDB = async (id: string) => {
   const result = await Requisition.findById(id).populate('feedbackId');

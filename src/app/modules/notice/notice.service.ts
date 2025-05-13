@@ -2,10 +2,20 @@ import status from 'http-status';
 import AppError from '../../errors/AppError';
 import { TNotice } from './notice.interface';
 import { Notice } from './notice.model';
+import QueryBuilder from '../../builder/QueryBuilder';
+import { noticeSearchableField } from './notice.constant';
 
-const allNoticeFromDB = async () => {
-  const result = await Notice.find();
-  return result;
+const allNoticeFromDB = async (query: Record<string, unknown>) => {
+  const noticeQuery = new QueryBuilder(Notice.find(), query)
+    .search(noticeSearchableField)
+    .fields()
+    .sort()
+    .paginate()
+    .filter();
+
+  const meta = await noticeQuery.countTotal();
+  const result = await noticeQuery.modelQuery;
+  return { meta, result };
 };
 const singleNoticeFromDB = async (id: string) => {
   const result = await Notice.findById(id);

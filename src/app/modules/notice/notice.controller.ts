@@ -5,7 +5,8 @@ import status from 'http-status';
 import { noticeService } from './notice.service';
 
 const allNotice: RequestHandler = catchAsync(async (req, res) => {
-  const result = await noticeService.allNoticeFromDB();
+  const { query } = req;
+  const result = await noticeService.allNoticeFromDB(query);
   sendResponse(res, {
     statusCode: status.OK,
     success: true,

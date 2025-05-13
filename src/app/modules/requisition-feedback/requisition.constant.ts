@@ -8,3 +8,4 @@ export const requisitionType = [
 ] as const;
 
 export const requisitionStatus = ['pending', 'approved', 'rejected'] as const;
+export const requisitionSearchableField = ['title', 'subtitle'];
