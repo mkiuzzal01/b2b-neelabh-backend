@@ -5,7 +5,8 @@ import sendResponse from '../utils/sendResponse';
 import status from 'http-status';
 
 const allOrder: RequestHandler = catchAsync(async (req, res) => {
-  const result = await orderService.allOrderFromDB();
+  const { query } = req;
+  const result = await orderService.allOrderFromDB(query);
   sendResponse(res, {
     statusCode: status.OK,
     success: true,

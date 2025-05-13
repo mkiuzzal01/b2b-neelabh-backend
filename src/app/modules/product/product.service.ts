@@ -9,6 +9,8 @@ import {
 } from '../category/category.model';
 import mongoose from 'mongoose';
 import { ProductVariant } from '../product-variant/product-variant-model';
+import QueryBuilder from '../../builder/QueryBuilder';
+import { productSearchableField } from './product.constant';
 
 const createProductIntoBD = async (payload: TProduct, creatorId: string) => {
   const session = await mongoose.startSession();
@@ -136,13 +138,24 @@ const updateProductIntoBD = async (id: string, payload: Partial<TProduct>) => {
   return result;
 };
 
-const getAllProductFromBD = async () => {
-  const result = await Product.find().populate([
-    { path: 'categories.mainCategory' },
-    { path: 'categories.category' },
-    { path: 'categories.subCategory' },
-  ]);
-  return result;
+const getAllProductFromBD = async (query: Record<string, unknown>) => {
+  const productQuery = new QueryBuilder(
+    Product.find().populate([
+      { path: 'categories.mainCategory' },
+      { path: 'categories.category' },
+      { path: 'categories.subCategory' },
+    ]),
+    query,
+  )
+    .search(productSearchableField)
+    .fields()
+    .filter()
+    .paginate()
+    .sort();
+
+  const meta = await productQuery.countTotal();
+  const result = await productQuery.modelQuery;
+  return { meta, result };
 };
 
 const getSingleProductFromDB = async (id: string) => {

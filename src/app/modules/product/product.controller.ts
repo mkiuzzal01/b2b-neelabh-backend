@@ -29,7 +29,8 @@ const updateProduct: RequestHandler = catchAsync(async (req, res) => {
 });
 
 const getAllProduct: RequestHandler = catchAsync(async (req, res) => {
-  const result = await productService.getAllProductFromBD();
+  const { query } = req;
+  const result = await productService.getAllProductFromBD(query);
   sendResponse(res, {
     statusCode: status.OK,
     success: true,

@@ -27,3 +27,4 @@ export const allowedStatusTransitions: Record<TOrderStatus, TOrderStatus[]> = {
 };
 
 export const paymentStatus = ['IN-COMPLETE', 'COMPLETED'] as const;
+export const orderSearchableField = ['orderStatus'];

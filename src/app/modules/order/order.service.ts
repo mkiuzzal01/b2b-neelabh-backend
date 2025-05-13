@@ -5,12 +5,25 @@ import mongoose from 'mongoose';
 import AppError from '../../errors/AppError';
 import status from 'http-status';
 import { Product } from '../product/product.model';
-import { allowedStatusTransitions } from './order.constant';
+import {
+  allowedStatusTransitions,
+  orderSearchableField,
+} from './order.constant';
 import { BankAccount } from '../user/user-model';
+import QueryBuilder from '../../builder/QueryBuilder';
 
-const allOrderFromDB = async () => {
-  const result = await Order.find();
-  return result;
+const allOrderFromDB = async (query: Record<string, unknown>) => {
+  const orderQuery = new QueryBuilder(Order.find(), query)
+    .search(orderSearchableField)
+    .fields()
+    .filter()
+    .sort()
+    .paginate();
+
+  const meta = await orderQuery.countTotal();
+  const result = await orderQuery.modelQuery;
+
+  return { meta, result };
 };
 
 const singleOrderFromDB = async (id: string) => {

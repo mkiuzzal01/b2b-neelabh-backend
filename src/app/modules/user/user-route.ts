@@ -29,4 +29,5 @@ router.patch(
   validationRequest(userValidation.updateUserValidationSchema),
   userController.updatedSeller,
 );
+
 export const userRoute = router;
