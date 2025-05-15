@@ -59,7 +59,10 @@ const stakeholderSchema = new Schema<TStakeHolder>(
       presentAddress: { type: String, required: true },
       permanentAddress: { type: String, required: true },
     },
-    profileImageUrl: { type: String, required: true },
+    profileImage: {
+      publicId: { type: String, required: true },
+      url: { type: String, required: true },
+    },
     isDeleted: { type: Boolean, default: false },
   },
   {

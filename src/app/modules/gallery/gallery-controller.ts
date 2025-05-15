@@ -52,6 +52,10 @@ const updateFolder: RequestHandler = catchAsync(async (req, res) => {
 
 const deleteFolder: RequestHandler = catchAsync(async (req, res) => {
   const id = req.params.id;
+
+  // before deleting image from cloudinary:
+
+  // the delete the database:
   const result = await galleryService.deleteFolderFromDB(id);
   sendResponse(res, {
     statusCode: status.OK,
@@ -86,7 +90,8 @@ const singlePhoto: RequestHandler = catchAsync(async (req, res) => {
 
 const createPhoto: RequestHandler = catchAsync(async (req, res) => {
   const data = req.body;
-  const result = await galleryService.createPhotoIntoDB(data);
+  const file = req.file;
+  const result = await galleryService.createPhotoIntoDB(data, file);
   sendResponse(res, {
     statusCode: status.OK,
     success: true,

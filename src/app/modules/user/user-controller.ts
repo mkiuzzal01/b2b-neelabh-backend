@@ -8,11 +8,13 @@ const createStackHolder: RequestHandler = catchAsync(
   async (req: Request, res: Response) => {
     const { password, role, stakeholder } = req.body;
     const creator = req.user.id;
+    const file = req.file;
     const result = await userService.createStackHolderBD(
       password,
       role,
       stakeholder,
       creator,
+      file,
     );
     sendResponse(res, {
       statusCode: status.OK,
@@ -27,10 +29,13 @@ const createSeller: RequestHandler = catchAsync(
   async (req: Request, res: Response) => {
     const { password, seller } = req.body;
     const creator = req.user.id;
+    const file = req.file;
+
     const result = await userService.createSellerIntoBD(
       password,
       seller,
       creator,
+      file,
     );
     sendResponse(res, {
       statusCode: status.OK,

@@ -36,9 +36,6 @@ const stakeholderBaseSchema = z.object({
       message: 'Invalid date format',
     }),
   address: addressSchema,
-  profileImageUrl: z
-    .string({ required_error: 'Profile image URL is required' })
-    .url('Invalid URL format'),
   isDeleted: z.boolean().default(false).optional(),
 });
 

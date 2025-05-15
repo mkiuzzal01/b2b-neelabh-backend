@@ -45,9 +45,6 @@ const sellerBaseSchema = z.object({
     }),
   address: addressSchema,
   bankAccountInfo: bankAccountInfoSchema,
-  profileImageUrl: z
-    .string({ required_error: 'Profile image URL is required' })
-    .url('Invalid URL format'),
   isDeleted: z.boolean().default(false).optional(),
 });
 

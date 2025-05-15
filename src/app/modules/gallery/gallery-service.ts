@@ -1,7 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import status from 'http-status';
 import AppError from '../../errors/AppError';
 import { TFolder, TPhoto } from './gallery-interface';
 import { Folder, Photo } from './gallery-model';
+import { sendImageToCloudinary } from '../../utils/sendImageToCloudinary';
+import { UploadApiResponse } from 'cloudinary';
+import { deleteImageFromCloudinary } from '../../utils/deleteImageFromCloudinary';
 
 //this is for folder:
 const allFolderFromDB = async () => {
@@ -57,11 +61,26 @@ const singlePhotoFromDB = async (id: string) => {
   }
   return isExistPhoto;
 };
-const createPhotoIntoDB = async (payload: TPhoto) => {
+
+const createPhotoIntoDB = async (payload: TPhoto, file: any) => {
   const isExistFolder = await Folder.findById(payload.folderId);
   if (!isExistFolder) {
     throw new AppError(status.NOT_FOUND, 'The folder not found');
   }
+
+  //upload image to cloudinary :
+  const { path } = file;
+  const imageName = `${payload.photoName}`;
+  const { secure_url, public_id } = (await sendImageToCloudinary(
+    imageName,
+    path,
+  )) as UploadApiResponse;
+
+  payload.photo = {
+    publicId: public_id as string,
+    url: secure_url as string,
+  };
+
   const result = await Photo.create(payload);
   return result;
 };
@@ -80,11 +99,15 @@ const updatePhotoIntoDB = async (payload: Partial<TPhoto>, id: string) => {
 };
 
 const deletePhotoFromDB = async (id: string) => {
-  const result = await Photo.findByIdAndDelete(id);
+  const result = await Photo.findById(id);
   if (!result) {
     throw new AppError(status.NOT_FOUND, 'The photo not found');
   }
 
+  //delete image from cloudinary:
+  await deleteImageFromCloudinary(result.photo.publicId);
+  //then delete the database:
+  await Photo.findByIdAndDelete(id);
   return null;
 };
 

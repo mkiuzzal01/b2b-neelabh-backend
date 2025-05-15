@@ -1,4 +1,5 @@
 import { Types } from 'mongoose';
+import { TImage } from '../../interface/TImage';
 
 export type TFolder = {
   name: string;
@@ -8,6 +9,6 @@ export type TFolder = {
 export type TPhoto = {
   folderId: Types.ObjectId;
   photoName: string;
-  photoUrl: string;
+  photo: TImage;
   isDeleted: boolean;
 };

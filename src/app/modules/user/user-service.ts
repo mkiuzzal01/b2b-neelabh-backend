@@ -9,12 +9,15 @@ import { TStakeHolder } from '../stake-holder/stakeholder-interface';
 import AppError from '../../errors/AppError';
 import status from 'http-status';
 import { Seller } from '../seller/seller-model';
+import { sendImageToCloudinary } from '../../utils/sendImageToCloudinary';
+import { UploadApiResponse } from 'cloudinary';
 
 const createStackHolderBD = async (
   password: string,
   role: TRole,
   payload: TStakeHolder,
   creator: string,
+  file: any,
 ) => {
   const session = await mongoose.startSession();
   session.startTransaction();
@@ -30,6 +33,20 @@ const createStackHolderBD = async (
 
     if (!newUser.length) {
       throw new AppError(status.BAD_REQUEST, 'Failed to create user');
+    }
+
+    // upload image to cloudinary :
+    if (file) {
+      const { path } = file;
+      const imageName = `${payload.name.firstName}${userData.email}${payload.name.middleName}${payload.name.lastName}`;
+      const { secure_url, public_id } = (await sendImageToCloudinary(
+        imageName,
+        path,
+      )) as UploadApiResponse;
+      payload.profileImage = {
+        publicId: public_id as string,
+        url: secure_url as string,
+      };
     }
 
     //create the stakeholder:
@@ -56,6 +73,7 @@ const createSellerIntoBD = async (
   password: string,
   payload: TSeller,
   creator: string,
+  file: any,
 ) => {
   const session = await mongoose.startSession();
   session.startTransaction();
@@ -88,6 +106,20 @@ const createSellerIntoBD = async (
       throw new AppError(status.BAD_REQUEST, 'Failed to create bank account');
     }
 
+    // upload image to cloudinary :
+    if (file) {
+      const { path } = file;
+      const imageName = `${payload.name.firstName}${userData.email}${payload.name.middleName}${payload.name.lastName}`;
+      const { secure_url, public_id } = (await sendImageToCloudinary(
+        imageName,
+        path,
+      )) as UploadApiResponse;
+
+      payload.profileImage = {
+        publicId: public_id as string,
+        url: secure_url as string,
+      };
+    }
     const createdBankAccount = newBankAccount[0];
 
     //create the seller:
@@ -99,10 +131,8 @@ const createSellerIntoBD = async (
     if (!newSeller.length) {
       throw new AppError(status.BAD_REQUEST, 'Failed to create seller');
     }
-
     await session.commitTransaction();
     session.endSession();
-
     return newSeller[0];
   } catch (error) {
     await session.abortTransaction();

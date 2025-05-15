@@ -20,7 +20,10 @@ export const photoSchema = new Schema<TPhoto>({
     type: Schema.Types.ObjectId,
   },
   photoName: { type: String, unique: true },
-  photoUrl: { type: String, required: true },
+  photo: {
+    publicId: { type: String, required: true },
+    url: { type: String, required: true },
+  },
   isDeleted: {
     type: Boolean,
     default: false,
