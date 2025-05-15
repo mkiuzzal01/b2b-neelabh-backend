@@ -157,14 +157,159 @@ const updateUserIntoDB = async (payload: Partial<TUser>, id: string) => {
 
 // this is service for overview :
 const adminDashboardOverviewFromDB = async () => {
-  const totalUsers = await User.countDocuments();
-  const totalStakeholders = await Stakeholder.countDocuments();
-  const totalSellers = await Seller.countDocuments();
+  try {
+    // Basic counts
+    const [totalUsers, totalStakeholders, totalSellers] = await Promise.all([
+      User.countDocuments(),
+      Stakeholder.countDocuments(),
+      Seller.countDocuments(),
+    ]);
 
+    // Aggregate product, order, and revenue data
+    const [productAgg, orderAgg, revenueAgg] = await Promise.all([
+      Seller.aggregate([
+        { $group: { _id: null, totalProducts: { $sum: '$productsCount' } } },
+      ]),
+      Seller.aggregate([
+        { $group: { _id: null, totalOrders: { $sum: '$ordersCount' } } },
+      ]),
+      Seller.aggregate([
+        { $group: { _id: null, totalRevenue: { $sum: '$revenue' } } },
+      ]),
+    ]);
+
+    if (!productAgg.length || !orderAgg.length || !revenueAgg.length) {
+      throw new AppError(
+        status.BAD_REQUEST,
+        'Failed to fetch aggregated overview data.',
+      );
+    }
+
+    const totalProducts = productAgg[0].totalProducts || 0;
+    const totalOrders = orderAgg[0].totalOrders || 0;
+    const totalRevenue = revenueAgg[0].totalRevenue || 0;
+
+    // Status-based overview
+    const [
+      activeUsers,
+      inactiveUsers,
+      activeStakeholders,
+      inactiveStakeholders,
+      activeSellers,
+      inactiveSellers,
+    ] = await Promise.all([
+      User.countDocuments({ status: 'active' }),
+      User.countDocuments({ status: 'inactive' }),
+      Stakeholder.countDocuments({ status: 'active' }),
+      Stakeholder.countDocuments({ status: 'inactive' }),
+      Seller.countDocuments({ status: 'active' }),
+      Seller.countDocuments({ status: 'inactive' }),
+    ]);
+
+    // Date-based overview
+    const [usersByDate, stakeholdersByDate, sellersByDate] = await Promise.all([
+      User.aggregate([
+        {
+          $group: {
+            _id: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } },
+            count: { $sum: 1 },
+          },
+        },
+        { $sort: { _id: 1 } },
+      ]),
+      Stakeholder.aggregate([
+        {
+          $group: {
+            _id: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } },
+            count: { $sum: 1 },
+          },
+        },
+        { $sort: { _id: 1 } },
+      ]),
+      Seller.aggregate([
+        {
+          $group: {
+            _id: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } },
+            count: { $sum: 1 },
+          },
+        },
+        { $sort: { _id: 1 } },
+      ]),
+    ]);
+
+    // Payment method overview
+    const [totalBankAccounts, bankAccountsByMethod, bankAccountsByStatus] =
+      await Promise.all([
+        BankAccount.countDocuments(),
+        BankAccount.aggregate([
+          { $group: { _id: '$paymentMethod', count: { $sum: 1 } } },
+          { $sort: { count: -1 } },
+        ]),
+        BankAccount.aggregate([
+          { $group: { _id: '$status', count: { $sum: 1 } } },
+          { $sort: { count: -1 } },
+        ]),
+      ]);
+
+    // Final response
+    return {
+      summary: {
+        totalUsers,
+        totalStakeholders,
+        totalSellers,
+        totalProducts,
+        totalOrders,
+        totalRevenue,
+      },
+      overviewByRole: {
+        users: totalUsers,
+        stakeholders: totalStakeholders,
+        sellers: totalSellers,
+        products: totalProducts,
+        orders: totalOrders,
+        revenue: totalRevenue,
+      },
+      overviewByStatus: {
+        activeUsers,
+        inactiveUsers,
+        activeStakeholders,
+        inactiveStakeholders,
+        activeSellers,
+        inactiveSellers,
+      },
+      overviewByDate: {
+        totalUsersByDate: usersByDate,
+        totalStakeholdersByDate: stakeholdersByDate,
+        totalSellersByDate: sellersByDate,
+      },
+      overviewByPaymentMethod: {
+        totalBankAccounts,
+        totalBankAccountsByMethod: bankAccountsByMethod,
+        totalBankAccountsByStatus: bankAccountsByStatus,
+      },
+    };
+  } catch (error) {
+    console.error('Error in adminDashboardOverviewFromDB:', error);
+    throw error;
+  }
+};
+
+const sellerDashboardOverviewFromDB = async (sellerId: string) => {
+  const totalProducts = await Seller.countDocuments({ _id: sellerId });
+  const totalOrders = await Seller.countDocuments({ _id: sellerId });
+  const totalRevenue = await Seller.aggregate([
+    { $match: { _id: new mongoose.Types.ObjectId(sellerId) } },
+    {
+      $group: {
+        _id: null,
+        totalRevenue: { $sum: '$revenue' },
+      },
+    },
+  ]);
   return {
-    totalUsers,
-    totalStakeholders,
-    totalSellers,
+    totalProducts,
+    totalOrders,
+    totalRevenue: totalRevenue[0]?.totalRevenue || 0,
   };
 };
 
@@ -173,4 +318,5 @@ export const userService = {
   createSellerIntoBD,
   updateUserIntoDB,
   adminDashboardOverviewFromDB,
+  sellerDashboardOverviewFromDB,
 };

@@ -44,7 +44,13 @@ route.patch(
 route.get(
   '/admin-dashboard-overview',
   auth(ACCESS_ROLE.SUPER_ADMIN, ACCESS_ROLE.ADMIN),
-  userController.dashboardOverview,
+  userController.adminDashboardOverview,
+);
+
+route.get(
+  '/seller-dashboard-overview',
+  auth(ACCESS_ROLE.SELLER),
+  userController.sellerDashboardOverview,
 );
 
 export const userRoute = route;

@@ -60,7 +60,7 @@ const updatedSeller: RequestHandler = catchAsync(
   },
 );
 
-const dashboardOverview: RequestHandler = catchAsync(async (req, res) => {
+const adminDashboardOverview: RequestHandler = catchAsync(async (req, res) => {
   const result = await userService.adminDashboardOverviewFromDB();
   sendResponse(res, {
     statusCode: status.OK,
@@ -70,9 +70,23 @@ const dashboardOverview: RequestHandler = catchAsync(async (req, res) => {
   });
 });
 
+const sellerDashboardOverview: RequestHandler = catchAsync(
+  async (req: Request, res: Response) => {
+    const sellerId = req.user.id;
+    const result = await userService.sellerDashboardOverviewFromDB(sellerId);
+    sendResponse(res, {
+      statusCode: status.OK,
+      success: true,
+      message: 'Seller dashboard overview fetched successfully',
+      data: result,
+    });
+  },
+);
+
 export const userController = {
   createStackHolder,
   createSeller,
   updatedSeller,
-  dashboardOverview,
+  adminDashboardOverview,
+  sellerDashboardOverview,
 };
