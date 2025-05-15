@@ -60,8 +60,19 @@ const updatedSeller: RequestHandler = catchAsync(
   },
 );
 
+const dashboardOverview: RequestHandler = catchAsync(async (req, res) => {
+  const result = await userService.adminDashboardOverviewFromDB();
+  sendResponse(res, {
+    statusCode: status.OK,
+    success: true,
+    message: 'Admin dashboard overview fetched successfully',
+    data: result,
+  });
+});
+
 export const userController = {
   createStackHolder,
   createSeller,
   updatedSeller,
+  dashboardOverview,
 };

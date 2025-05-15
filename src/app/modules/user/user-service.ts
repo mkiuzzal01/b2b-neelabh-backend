@@ -155,8 +155,22 @@ const updateUserIntoDB = async (payload: Partial<TUser>, id: string) => {
   return updatedUser;
 };
 
+// this is service for overview :
+const adminDashboardOverviewFromDB = async () => {
+  const totalUsers = await User.countDocuments();
+  const totalStakeholders = await Stakeholder.countDocuments();
+  const totalSellers = await Seller.countDocuments();
+
+  return {
+    totalUsers,
+    totalStakeholders,
+    totalSellers,
+  };
+};
+
 export const userService = {
   createStackHolderBD,
   createSellerIntoBD,
   updateUserIntoDB,
+  adminDashboardOverviewFromDB,
 };
