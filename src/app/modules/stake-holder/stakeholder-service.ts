@@ -1,15 +1,27 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import status from 'http-status';
 import AppError from '../../errors/AppError';
 import { TStakeHolder } from './stakeholder-interface';
 import { Stakeholder } from './stakeholder-model';
+import QueryBuilder from '../../builder/QueryBuilder';
+import { searchableFields } from './stakeholder-constant';
 
-const getAllStakeholdersFromDB = async () => {
-  const result = await Stakeholder.find().populate('userId');
-  return result;
+const allStakeholdersFromDB = async (query: Record<string, unknown>) => {
+  const queryBuilder = new QueryBuilder(
+    Stakeholder.find().populate('userId'),
+    query,
+  )
+    .search(searchableFields)
+    .fields()
+    .filter()
+    .paginate()
+    .sort();
+
+  const meta = await queryBuilder.countTotal();
+  const result = await queryBuilder.modelQuery;
+  return { meta, result };
 };
 
-const getSingleStakeholderFromDB = async (id: string) => {
+const singleStakeholderFromDB = async (id: string) => {
   const result = await Stakeholder.findById(id).populate('userId');
   if (!result) {
     throw new AppError(status.NOT_FOUND, 'This is stake holder not found');
@@ -79,8 +91,8 @@ const deleteStakeHolderFromDB = async (id: string) => {
 };
 
 export const stakeholderService = {
-  getAllStakeholdersFromDB,
-  getSingleStakeholderFromDB,
+  allStakeholdersFromDB,
+  singleStakeholderFromDB,
   updateStakeholderIntoDB,
   deleteStakeHolderFromDB,
 };

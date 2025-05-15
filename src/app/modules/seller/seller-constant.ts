@@ -18,3 +18,9 @@ export const bankName = [
   'SoutheastBank',
   'NationalBank',
 ] as const;
+
+export const sellerSearchableField = [
+  'name.firstName',
+  'name.middleName',
+  'name.lastName',
+];

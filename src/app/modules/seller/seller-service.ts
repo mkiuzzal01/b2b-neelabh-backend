@@ -1,18 +1,28 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import status from 'http-status';
 import AppError from '../../errors/AppError';
 import { Seller } from './seller-model';
 import { TSeller } from './seller-interface';
 import { BankAccount } from '../user/user-model';
+import QueryBuilder from '../../builder/QueryBuilder';
+import { sellerSearchableField } from './seller-constant';
 
-const getAllSellersFromDB = async () => {
-  const result = await Seller.find()
-    .populate('userId')
-    .populate('bankAccountInfo');
-  return result;
+const allSellersFromDB = async (query: Record<string, unknown>) => {
+  const queryBuilder = new QueryBuilder(
+    Seller.find().populate('userId').populate('bankAccountInfo'),
+    query,
+  )
+    .search(sellerSearchableField)
+    .fields()
+    .filter()
+    .paginate()
+    .sort();
+
+  const meta = await queryBuilder.countTotal();
+  const result = await queryBuilder.modelQuery;
+  return { meta, result };
 };
 
-const getSingleSellerFromDB = async (id: string) => {
+const singleSellerFromDB = async (id: string) => {
   const result = await Seller.findById(id)
     .populate('userId')
     .populate('bankAccountInfo');
@@ -92,8 +102,8 @@ const deleteSellerFromDB = async (id: string) => {
 };
 
 export const sellerService = {
+  allSellersFromDB,
+  singleSellerFromDB,
   updateSellerIntoDB,
-  getAllSellersFromDB,
-  getSingleSellerFromDB,
   deleteSellerFromDB,
 };

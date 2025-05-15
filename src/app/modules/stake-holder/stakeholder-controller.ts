@@ -1,13 +1,11 @@
-import { Request, RequestHandler, Response } from 'express';
+import { RequestHandler } from 'express';
 import { stakeholderService } from './stakeholder-service';
 import sendResponse from '../utils/sendResponse';
 import { status } from 'http-status';
 
-const getAllStakeholder: RequestHandler = async (
-  req: Request,
-  res: Response,
-) => {
-  const result = await stakeholderService.getAllStakeholdersFromDB();
+const getAllStakeholder: RequestHandler = async (req, res) => {
+  const { query } = req;
+  const result = await stakeholderService.allStakeholdersFromDB(query);
   sendResponse(res, {
     statusCode: status.OK,
     success: true,
@@ -16,12 +14,9 @@ const getAllStakeholder: RequestHandler = async (
   });
 };
 
-const getSingleStakeholder: RequestHandler = async (
-  req: Request,
-  res: Response,
-) => {
+const getSingleStakeholder: RequestHandler = async (req, res) => {
   const { id } = req.params;
-  const result = await stakeholderService.getSingleStakeholderFromDB(id);
+  const result = await stakeholderService.singleStakeholderFromDB(id);
   sendResponse(res, {
     statusCode: status.OK,
     success: true,
@@ -29,10 +24,7 @@ const getSingleStakeholder: RequestHandler = async (
     data: result,
   });
 };
-const updateStakeholder: RequestHandler = async (
-  req: Request,
-  res: Response,
-) => {
+const updateStakeholder: RequestHandler = async (req, res) => {
   const { id } = req.params;
   const { stakeholder } = req.body;
   const result = await stakeholderService.updateStakeholderIntoDB(
@@ -47,10 +39,7 @@ const updateStakeholder: RequestHandler = async (
   });
 };
 
-const deleteStakeHolder: RequestHandler = async (
-  req: Request,
-  res: Response,
-) => {
+const deleteStakeHolder: RequestHandler = async (req, res) => {
   const id = req.params.id;
   const result = await stakeholderService.deleteStakeHolderFromDB(id);
   sendResponse(res, {

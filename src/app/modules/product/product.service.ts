@@ -138,7 +138,7 @@ const updateProductIntoBD = async (id: string, payload: Partial<TProduct>) => {
   return result;
 };
 
-const getAllProductFromBD = async (query: Record<string, unknown>) => {
+const allProductFromBD = async (query: Record<string, unknown>) => {
   const productQuery = new QueryBuilder(
     Product.find().populate([
       { path: 'categories.mainCategory' },
@@ -158,7 +158,7 @@ const getAllProductFromBD = async (query: Record<string, unknown>) => {
   return { meta, result };
 };
 
-const getSingleProductFromDB = async (id: string) => {
+const singleProductFromDB = async (id: string) => {
   const result = await Product.findById(id).populate([
     { path: 'categories.mainCategory' },
     { path: 'categories.category' },
@@ -184,7 +184,7 @@ const deleteProductFromDB = async (id: string) => {
 export const productService = {
   createProductIntoBD,
   updateProductIntoBD,
-  getAllProductFromBD,
-  getSingleProductFromDB,
+  allProductFromBD,
+  singleProductFromDB,
   deleteProductFromDB,
 };

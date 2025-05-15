@@ -14,7 +14,7 @@ app.use('/api/v1/', router);
 
 // Home route:
 app.get('/', (req: Request, res: Response) => {
-  res.send('Welcome to b2b neelabh');
+  res.send({ success: true, message: 'Welcome to neelabh b2b!' });
 });
 
 // Test route:

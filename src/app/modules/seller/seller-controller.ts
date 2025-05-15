@@ -3,8 +3,9 @@ import sendResponse from '../utils/sendResponse';
 import { sellerService } from './seller-service';
 import status from 'http-status';
 
-const getAllSellers: RequestHandler = async (req: Request, res: Response) => {
-  const result = await sellerService.getAllSellersFromDB();
+const allSeller: RequestHandler = async (req: Request, res: Response) => {
+  const { query } = req;
+  const result = await sellerService.allSellersFromDB(query);
   sendResponse(res, {
     statusCode: status.OK,
     success: true,
@@ -13,9 +14,9 @@ const getAllSellers: RequestHandler = async (req: Request, res: Response) => {
   });
 };
 
-const getSingleSeller: RequestHandler = async (req: Request, res: Response) => {
+const singleSeller: RequestHandler = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const result = await sellerService.getSingleSellerFromDB(id);
+  const result = await sellerService.singleSellerFromDB(id);
   sendResponse(res, {
     statusCode: status.OK,
     success: true,
@@ -48,8 +49,8 @@ const deleteSeller: RequestHandler = async (req: Request, res: Response) => {
 };
 
 export const sellerController = {
+  allSeller,
+  singleSeller,
   updateSeller,
-  getAllSellers,
-  getSingleSeller,
   deleteSeller,
 };
