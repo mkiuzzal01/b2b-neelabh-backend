@@ -5,10 +5,22 @@ import { AuthController } from './auth.controller';
 
 const route = Router();
 
-route.get(
+route.post(
   '/login',
   validationRequest(authValidation.loginValidationSchema),
-  AuthController.loginUser,
+  AuthController.login,
 );
+
+route.post(
+  '/refresh-token',
+  validationRequest(authValidation.refreshTokenValidation),
+  AuthController.refreshToken,
+);
+
+// route.post('/change-password');
+
+// route.post('/forgot-password');
+
+// route.post('/reset-password');
 
 export const authRouter = route;
