@@ -60,6 +60,19 @@ const updatedSeller: RequestHandler = catchAsync(
   },
 );
 
+const getUser: RequestHandler = catchAsync(
+  async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const result = await userService.getUserFromDB(id);
+    sendResponse(res, {
+      statusCode: status.OK,
+      success: true,
+      message: 'user retrieve successfully',
+      data: result,
+    });
+  },
+);
+
 const adminDashboardOverview: RequestHandler = catchAsync(async (req, res) => {
   const result = await userService.adminDashboardOverviewFromDB();
   sendResponse(res, {
@@ -87,6 +100,7 @@ export const userController = {
   createStackHolder,
   createSeller,
   updatedSeller,
+  getUser,
   adminDashboardOverview,
   sellerDashboardOverview,
 };

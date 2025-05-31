@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import mongoose from 'mongoose';
 import { TBankAccountInfo, TRole, TUser } from './user-interface';
 import config from '../../config';
@@ -155,6 +154,11 @@ const updateUserIntoDB = async (payload: Partial<TUser>, id: string) => {
   return updatedUser;
 };
 
+// get user from db:
+const getUserFromDB = async (id: string) => {
+  const result = await User.findById(id);
+  return result;
+};
 // this is service for overview :
 const adminDashboardOverviewFromDB = async () => {
   try {
@@ -317,6 +321,7 @@ export const userService = {
   createStackHolderBD,
   createSellerIntoBD,
   updateUserIntoDB,
+  getUserFromDB,
   adminDashboardOverviewFromDB,
   sellerDashboardOverviewFromDB,
 };

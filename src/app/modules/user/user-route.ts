@@ -42,6 +42,18 @@ route.patch(
 );
 
 route.get(
+  '/user-info/:id',
+  auth(
+    ACCESS_ROLE.SUPER_ADMIN,
+    ACCESS_ROLE.ADMIN,
+    ACCESS_ROLE.SELLER,
+    ACCESS_ROLE.ACCOUNTANT,
+    ACCESS_ROLE.PRODUCT_MANAGER,
+  ),
+  userController.getUser,
+);
+
+route.get(
   '/admin-dashboard-overview',
   auth(ACCESS_ROLE.SUPER_ADMIN, ACCESS_ROLE.ADMIN),
   userController.adminDashboardOverview,
