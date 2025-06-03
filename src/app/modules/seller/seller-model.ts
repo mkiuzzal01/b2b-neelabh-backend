@@ -51,10 +51,10 @@ const sellerSchema = new Schema<TSeller>(
       ref: 'BankAccountInfo',
       required: true,
     },
-    profileImage: {
-      publicId: { type: String, required: true },
-      url: { type: String, required: true },
-    },
+    // profileImage: {
+    //   publicId: { type: String, required: true },
+    //   url: { type: String, required: true },
+    // },
     isDeleted: { type: Boolean, default: false },
   },
   {

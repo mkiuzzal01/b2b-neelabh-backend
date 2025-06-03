@@ -9,8 +9,6 @@ import { ACCESS_ROLE } from '../../interface/AccessRole';
 export type TRole = (typeof ACCESS_ROLE)[keyof typeof ACCESS_ROLE];
 
 export interface TUser {
-  id: any;
-  _id?: string;
   email: string;
   role: TRole;
   status: TProfileStatus;
@@ -23,7 +21,7 @@ export interface TUser {
 export type TBankAccountInfo = {
   userId: Types.ObjectId;
   accountNumber: string;
-  transitionId?: string;
+  // transitionId?: string;
   accountHolderName: string;
   paymentMethod: TPaymentMethod;
   bankName: TBankName;

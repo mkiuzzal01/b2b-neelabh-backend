@@ -1,6 +1,6 @@
 import { Types } from 'mongoose';
 import { TGender } from '../../interface/TGender';
-import { TImage } from '../../interface/TImage';
+// import { TImage } from '../../interface/TImage';
 
 export type TStakeHolderAddress = {
   presentAddress: string;
@@ -25,6 +25,6 @@ export type TStakeHolder = {
   gender: TGender;
   dateOfJoining: Date;
   address: TStakeHolderAddress;
-  profileImage: TImage;
+  // profileImage: TImage;
   isDeleted: boolean;
 };

@@ -12,19 +12,23 @@ export const auth = (...requiredRole: TRole[]) => {
     const token = req.headers.authorization;
 
     if (!token) {
-      throw new AppError(status.UNAUTHORIZED, 'you are not authorized');
+      throw new AppError(status.UNAUTHORIZED, 'Unauthorized');
     }
 
     //verified token with decode:
-    const decoded = jwt.verify(
-      token,
-      config.access_token_secret as string,
-    ) as JwtPayload;
-
+    let decoded;
+    try {
+      decoded = jwt.verify(
+        token,
+        config.access_token_secret as string,
+      ) as JwtPayload;
+    } catch {
+      throw new AppError(status.UNAUTHORIZED, 'You are not authorized');
+    }
     //verification of role and authorization :
     const { role, id, iat } = decoded;
 
-    const isUserExist = await User.findById({ _id: id });
+    const isUserExist = await User.findById(id);
 
     if (!isUserExist) {
       throw new AppError(status.NOT_FOUND, 'User not found');

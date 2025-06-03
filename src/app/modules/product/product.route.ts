@@ -7,8 +7,17 @@ import { auth } from '../../middlewares/auth';
 
 const route = Router();
 
-route.get('/all-product', productController.getAllProduct);
-route.get('/single-product/:id', productController.getSingleProduct);
+route.get(
+  '/all-product',
+  auth(
+    ACCESS_ROLE.SUPER_ADMIN,
+    ACCESS_ROLE.ADMIN,
+    ACCESS_ROLE.PRODUCT_MANAGER,
+    ACCESS_ROLE.SELLER,
+  ),
+  productController.allProduct,
+);
+route.get('/single-product/:id', productController.singleProduct);
 route.post(
   '/create-product',
   auth(ACCESS_ROLE.SUPER_ADMIN, ACCESS_ROLE.ADMIN, ACCESS_ROLE.SELLER),

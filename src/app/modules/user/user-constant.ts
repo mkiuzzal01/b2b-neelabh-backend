@@ -5,7 +5,6 @@ export const profileStatus = [
   'leaved',
 ] as const;
 export const role = [
-  'superAdmin',
   'admin',
   'seller',
   'productManager',

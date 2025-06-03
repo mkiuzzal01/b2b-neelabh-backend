@@ -28,9 +28,9 @@ const updateProduct: RequestHandler = catchAsync(async (req, res) => {
   });
 });
 
-const getAllProduct: RequestHandler = catchAsync(async (req, res) => {
+const allProduct: RequestHandler = catchAsync(async (req, res) => {
   const { query } = req;
-  const result = await productService.getAllProductFromBD(query);
+  const result = await productService.allProductFromBD(query);
   sendResponse(res, {
     statusCode: status.OK,
     success: true,
@@ -38,9 +38,9 @@ const getAllProduct: RequestHandler = catchAsync(async (req, res) => {
     data: result,
   });
 });
-const getSingleProduct: RequestHandler = catchAsync(async (req, res) => {
+const singleProduct: RequestHandler = catchAsync(async (req, res) => {
   const id = req.params.id;
-  const result = await productService.getSingleProductFromDB(id);
+  const result = await productService.singleProductFromDB(id);
   sendResponse(res, {
     statusCode: status.OK,
     success: true,
@@ -62,7 +62,7 @@ const deleteProduct: RequestHandler = catchAsync(async (req, res) => {
 export const productController = {
   createProduct,
   updateProduct,
-  getAllProduct,
-  getSingleProduct,
+  allProduct,
+  singleProduct,
   deleteProduct,
 };

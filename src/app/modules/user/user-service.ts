@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import mongoose from 'mongoose';
 import { TBankAccountInfo, TRole, TUser } from './user-interface';
 import config from '../../config';
@@ -8,19 +9,18 @@ import { TStakeHolder } from '../stake-holder/stakeholder-interface';
 import AppError from '../../errors/AppError';
 import status from 'http-status';
 import { Seller } from '../seller/seller-model';
-import { sendImageToCloudinary } from '../../utils/sendImageToCloudinary';
-import { UploadApiResponse } from 'cloudinary';
+// import { sendImageToCloudinary } from '../../utils/sendImageToCloudinary';
+// import { UploadApiResponse } from 'cloudinary';
 
 const createStackHolderBD = async (
   password: string,
   role: TRole,
   payload: TStakeHolder,
   creator: string,
-  file: any,
+  // file: any,
 ) => {
   const session = await mongoose.startSession();
   session.startTransaction();
-
   try {
     const userData: Partial<TUser> = {};
     userData.email = payload.email;
@@ -35,18 +35,18 @@ const createStackHolderBD = async (
     }
 
     // upload image to cloudinary :
-    if (file) {
-      const { path } = file;
-      const imageName = `${payload.name.firstName}${userData.email}${payload.name.middleName}${payload.name.lastName}`;
-      const { secure_url, public_id } = (await sendImageToCloudinary(
-        imageName,
-        path,
-      )) as UploadApiResponse;
-      payload.profileImage = {
-        publicId: public_id as string,
-        url: secure_url as string,
-      };
-    }
+    // if (file) {
+    //   const { path } = file;
+    //   const imageName = `${payload.name.firstName}${userData.email}${payload.name.middleName}${payload.name.lastName}`;
+    //   const { secure_url, public_id } = (await sendImageToCloudinary(
+    //     imageName,
+    //     path,
+    //   )) as UploadApiResponse;
+    //   payload.profileImage = {
+    //     publicId: public_id as string,
+    //     url: secure_url as string,
+    //   };
+    // }
 
     //create the stakeholder:
     payload.userId = newUser[0]._id as any;
@@ -72,7 +72,7 @@ const createSellerIntoBD = async (
   password: string,
   payload: TSeller,
   creator: string,
-  file: any,
+  // file: any,
 ) => {
   const session = await mongoose.startSession();
   session.startTransaction();
@@ -106,19 +106,19 @@ const createSellerIntoBD = async (
     }
 
     // upload image to cloudinary :
-    if (file) {
-      const { path } = file;
-      const imageName = `${payload.name.firstName}${userData.email}${payload.name.middleName}${payload.name.lastName}`;
-      const { secure_url, public_id } = (await sendImageToCloudinary(
-        imageName,
-        path,
-      )) as UploadApiResponse;
+    // if (file) {
+    //   const { path } = file;
+    //   const imageName = `${payload.name.firstName}${userData.email}${payload.name.middleName}${payload.name.lastName}`;
+    //   const { secure_url, public_id } = (await sendImageToCloudinary(
+    //     imageName,
+    //     path,
+    //   )) as UploadApiResponse;
 
-      payload.profileImage = {
-        publicId: public_id as string,
-        url: secure_url as string,
-      };
-    }
+    //   payload.profileImage = {
+    //     publicId: public_id as string,
+    //     url: secure_url as string,
+    //   };
+    // }
     const createdBankAccount = newBankAccount[0];
 
     //create the seller:
@@ -154,8 +154,14 @@ const updateUserIntoDB = async (payload: Partial<TUser>, id: string) => {
   return updatedUser;
 };
 
+//get all user form db:
+const allUserFromDB = async () => {
+  const result = await User.find();
+  return result;
+};
+
 // get user from db:
-const getUserFromDB = async (id: string) => {
+const singleUserFromDB = async (id: string) => {
   const result = await User.findById(id);
   return result;
 };
@@ -321,7 +327,8 @@ export const userService = {
   createStackHolderBD,
   createSellerIntoBD,
   updateUserIntoDB,
-  getUserFromDB,
+  allUserFromDB,
+  singleUserFromDB,
   adminDashboardOverviewFromDB,
   sellerDashboardOverviewFromDB,
 };
