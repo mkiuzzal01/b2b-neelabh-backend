@@ -1,6 +1,6 @@
 import { RequestHandler } from 'express';
 import catchAsync from '../utils/catchAsync';
-import { galleryService } from './gallery-service';
+import { galleryService } from './gallery.service';
 import sendResponse from '../utils/sendResponse';
 import status from 'http-status';
 
@@ -68,7 +68,8 @@ const deleteFolder: RequestHandler = catchAsync(async (req, res) => {
 // this is photo controller:
 
 const allPhoto: RequestHandler = catchAsync(async (req, res) => {
-  const result = await galleryService.allPhotoFromDB();
+  const { query } = req;
+  const result = await galleryService.allPhotoFromDB(query);
   sendResponse(res, {
     statusCode: status.OK,
     success: true,
@@ -90,12 +91,14 @@ const singlePhoto: RequestHandler = catchAsync(async (req, res) => {
 
 const createPhoto: RequestHandler = catchAsync(async (req, res) => {
   const data = req.body;
-  const file = req.file;
-  const result = await galleryService.createPhotoIntoDB(data, file);
+  const files = req.files as Express.Multer.File[];
+
+  const result = await galleryService.createPhotoIntoDB(data, files);
+
   sendResponse(res, {
     statusCode: status.OK,
     success: true,
-    message: 'This is photo created successfully',
+    message: 'Photos created successfully',
     data: result,
   });
 });

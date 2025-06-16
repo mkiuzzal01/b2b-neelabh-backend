@@ -12,7 +12,7 @@ import {
 } from '../modules/requisition-feedback/requisition.route';
 import { authRouter } from '../modules/auth/auth.route';
 import { orderRoute } from '../modules/order/order.route';
-import { galleryRouter } from '../modules/gallery/gallery-route';
+import { galleryRouter } from '../modules/gallery/gallery.route';
 
 const router = Router();
 

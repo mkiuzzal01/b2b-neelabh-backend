@@ -1,11 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import status from 'http-status';
 import AppError from '../../errors/AppError';
-import { TFolder, TPhoto } from './gallery-interface';
-import { Folder, Photo } from './gallery-model';
+import { TFolder, TPhoto } from './gallery.interface';
+import { Folder, Photo } from './gallery.model';
 import { sendImageToCloudinary } from '../../utils/sendImageToCloudinary';
 import { UploadApiResponse } from 'cloudinary';
 import { deleteImageFromCloudinary } from '../../utils/deleteImageFromCloudinary';
+import QueryBuilder from '../../builder/QueryBuilder';
+import { photoSearchableFields } from './gallery.constant';
 
 //this is for folder:
 const allFolderFromDB = async () => {
@@ -49,9 +51,16 @@ const deleteFolderFromDB = async (id: string) => {
 
 //this is for image:
 
-const allPhotoFromDB = async () => {
-  const result = await Photo.find();
-  return result;
+const allPhotoFromDB = async (query: Record<string, unknown>) => {
+  const imageQuery = new QueryBuilder(Photo.find(), query)
+    .search(photoSearchableFields)
+    .fields()
+    .filter()
+    .paginate()
+    .sort();
+  const meta = await imageQuery.countTotal();
+  const result = await imageQuery.modelQuery;
+  return { meta, result };
 };
 
 const singlePhotoFromDB = async (id: string) => {
@@ -62,26 +71,37 @@ const singlePhotoFromDB = async (id: string) => {
   return isExistPhoto;
 };
 
-const createPhotoIntoDB = async (payload: TPhoto, file: any) => {
+const createPhotoIntoDB = async (
+  payload: TPhoto,
+  files: Express.Multer.File[],
+) => {
   const isExistFolder = await Folder.findById(payload.folderId);
   if (!isExistFolder) {
     throw new AppError(status.NOT_FOUND, 'The folder not found');
   }
 
-  //upload image to cloudinary :
-  const { path } = file;
-  const imageName = `${payload.photoName}`;
-  const { secure_url, public_id } = (await sendImageToCloudinary(
-    imageName,
-    path,
-  )) as UploadApiResponse;
+  const docs = [];
 
-  payload.photo = {
-    publicId: public_id as string,
-    url: secure_url as string,
-  };
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i];
+    const name = payload.photoName[i] || file.originalname;
 
-  const result = await Photo.create(payload);
+    const { secure_url, public_id } = (await sendImageToCloudinary(
+      name,
+      file.path,
+    )) as UploadApiResponse;
+
+    docs.push({
+      folderId: payload.folderId,
+      photoName: name,
+      photo: {
+        publicId: public_id,
+        url: secure_url,
+      },
+    });
+  }
+
+  const result = await Photo.insertMany(docs);
   return result;
 };
 

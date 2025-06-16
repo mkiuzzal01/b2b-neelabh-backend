@@ -1,5 +1,5 @@
 import { model, Schema } from 'mongoose';
-import { TFolder, TPhoto } from './gallery-interface';
+import { TFolder, TPhoto } from './gallery.interface';
 
 export const folderSchema = new Schema<TFolder>({
   name: {

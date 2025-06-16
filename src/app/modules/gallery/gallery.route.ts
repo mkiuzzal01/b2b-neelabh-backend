@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response, Router } from 'express';
-import { galleryController } from './gallery-controller';
+import { galleryController } from './gallery.controller';
 import { auth } from '../../middlewares/auth';
 import { ACCESS_ROLE } from '../../interface/AccessRole';
 import { upload } from '../../utils/sendImageToCloudinary';
@@ -14,13 +14,21 @@ route.patch('/update-folder/:id', galleryController.updateFolder);
 route.delete('/delete-folder/:id', galleryController.deleteFolder);
 
 //this is photo route:
-
-route.get('/all-photo', galleryController.allPhoto);
+route.get(
+  '/all-photo',
+  auth(
+    ACCESS_ROLE.SUPER_ADMIN,
+    ACCESS_ROLE.ADMIN,
+    ACCESS_ROLE.PRODUCT_MANAGER,
+    ACCESS_ROLE.SELLER,
+  ),
+  galleryController.allPhoto,
+);
 route.get('/single-photo/:id', galleryController.singlePhoto);
 route.post(
   '/create-photo',
   auth(ACCESS_ROLE.SUPER_ADMIN, ACCESS_ROLE.ADMIN),
-  upload.single('file'),
+  upload.array('files', 10),
   (req: Request, res: Response, next: NextFunction) => {
     req.body = JSON.parse(req.body.data);
     next();
