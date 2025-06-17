@@ -32,6 +32,7 @@ const createSeller: RequestHandler = catchAsync(async (req, res) => {
     creator,
     // file,
   );
+
   sendResponse(res, {
     statusCode: status.OK,
     success: true,

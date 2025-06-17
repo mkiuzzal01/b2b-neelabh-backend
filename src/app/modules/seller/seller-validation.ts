@@ -45,6 +45,10 @@ const sellerBaseSchema = z.object({
     }),
   address: addressSchema,
   bankAccountInfo: bankAccountInfoSchema,
+  profileImage: z.object({
+    publicId: z.string(),
+    url: z.string(),
+  }),
   isDeleted: z.boolean().default(false).optional(),
 });
 

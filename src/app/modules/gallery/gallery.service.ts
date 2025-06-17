@@ -7,12 +7,22 @@ import { sendImageToCloudinary } from '../../utils/sendImageToCloudinary';
 import { UploadApiResponse } from 'cloudinary';
 import { deleteImageFromCloudinary } from '../../utils/deleteImageFromCloudinary';
 import QueryBuilder from '../../builder/QueryBuilder';
-import { photoSearchableFields } from './gallery.constant';
+import {
+  folderSearchableField,
+  photoSearchableFields,
+} from './gallery.constant';
 
 //this is for folder:
-const allFolderFromDB = async () => {
-  const result = await Folder.find();
-  return result;
+const allFolderFromDB = async (query: Record<string, unknown>) => {
+  const folderQuery = new QueryBuilder(Folder.find(), query).search(
+    folderSearchableField,
+  );
+  const meta = await folderQuery.countTotal();
+  const result = await folderQuery.modelQuery;
+  return {
+    meta,
+    result,
+  };
 };
 
 const singleFolderFromDB = async (id: string) => {

@@ -1,6 +1,6 @@
 import { Types } from 'mongoose';
 import { TGender } from '../../interface/TGender';
-// import { TImage } from '../../interface/TImage';
+import { TImage } from '../../interface/TImage';
 
 export type TAddress = {
   presentAddress: string;
@@ -26,6 +26,6 @@ export type TSeller = {
   dateOfJoining: Date;
   bankAccountInfo: Types.ObjectId;
   address: TAddress;
-  // profileImage: TImage;
+  profileImage?: TImage;
   isDeleted: boolean;
 };

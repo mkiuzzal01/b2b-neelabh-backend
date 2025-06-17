@@ -7,7 +7,8 @@ import status from 'http-status';
 // this is folder controller:
 
 const allFolder: RequestHandler = catchAsync(async (req, res) => {
-  const result = await galleryService.allFolderFromDB();
+  const { query } = req;
+  const result = await galleryService.allFolderFromDB(query);
   sendResponse(res, {
     statusCode: status.OK,
     success: true,
