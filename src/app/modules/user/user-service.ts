@@ -72,7 +72,6 @@ const createSellerIntoBD = async (
   password: string,
   payload: TSeller,
   creator: string,
-  // file: any,
 ) => {
   const session = await mongoose.startSession();
   session.startTransaction();
@@ -105,20 +104,6 @@ const createSellerIntoBD = async (
       throw new AppError(status.BAD_REQUEST, 'Failed to create bank account');
     }
 
-    // upload image to cloudinary :
-    // if (file) {
-    //   const { path } = file;
-    //   const imageName = `${payload.name.firstName}${userData.email}${payload.name.middleName}${payload.name.lastName}`;
-    //   const { secure_url, public_id } = (await sendImageToCloudinary(
-    //     imageName,
-    //     path,
-    //   )) as UploadApiResponse;
-
-    //   payload.profileImage = {
-    //     publicId: public_id as string,
-    //     url: secure_url as string,
-    //   };
-    // }
     const createdBankAccount = newBankAccount[0];
 
     //create the seller:
@@ -161,8 +146,11 @@ const allUserFromDB = async () => {
 };
 
 // get user from db:
-const singleUserFromDB = async (id: string) => {
-  const result = await User.findById(id);
+const singleUserFromDB = async (slug: string) => {
+  const result = await User.findOne({ slug });
+  if (!result) {
+    throw new AppError(status.NOT_FOUND, 'this user not found');
+  }
   return result;
 };
 // this is service for overview :

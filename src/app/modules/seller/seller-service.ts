@@ -23,7 +23,7 @@ const allSellersFromDB = async (query: Record<string, unknown>) => {
 };
 
 const singleSellerFromDB = async (id: string) => {
-  const result = await Seller.findById(id)
+  const result = await Seller.findOne({ userId: id })
     .populate('userId')
     .populate('bankAccountInfo');
   if (!result) {

@@ -66,6 +66,15 @@ const productSchema = new Schema<TProduct>(
       enum: productActivity,
       default: 'in-stock',
     },
+    optionalLinks: {
+      type: String,
+      default: '',
+    },
+    productImage: {
+      type: Schema.Types.ObjectId,
+      ref: 'Photo',
+      required: true,
+    },
     isDeleted: { type: Boolean, default: false },
   },
   {

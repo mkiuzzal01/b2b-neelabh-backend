@@ -35,6 +35,8 @@ const baseProductSchema = z.object({
   description: z.string().min(1, 'Description is required'),
   status: z.enum(productStatus).default('in-stock'),
   activity: z.enum(productActivity).default('in-stock'),
+  optionalLinks: z.string(),
+  productImage: z.string().min(1, 'Product image is required'),
   isDeleted: z.boolean().default(false),
 });
 

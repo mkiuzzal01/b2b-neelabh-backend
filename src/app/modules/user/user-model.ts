@@ -3,6 +3,7 @@ import { TBankAccountInfo, TUser, UserModel } from './user-interface';
 import { profileStatus, role } from './user-constant';
 import bcrypt from 'bcrypt';
 import config from '../../config';
+import slugify from 'slugify';
 
 const userSchema = new Schema<TUser, UserModel>(
   {
@@ -37,9 +38,17 @@ const userSchema = new Schema<TUser, UserModel>(
       type: Boolean,
       default: false,
     },
+    slug: { type: String },
   },
   { timestamps: true },
 );
+
+//make slug:
+userSchema.pre('save', function (next) {
+  const slugText = `${this.status}hadaf${this.role}${this.email}/code/fbb`;
+  this.slug = slugify(slugText.trim(), { lower: true, strict: true });
+  next();
+});
 
 //hash password before saving:
 userSchema.pre('save', async function (next) {

@@ -6,18 +6,12 @@ import { sellerValidation } from '../seller/seller-validation';
 import { auth } from '../../middlewares/auth';
 import { ACCESS_ROLE } from '../../interface/AccessRole';
 import { userValidation } from './user-validation';
-// import { upload } from '../../utils/sendImageToCloudinary';
 
 const route = Router();
 
 route.post(
   '/create-stakeholder',
   auth(ACCESS_ROLE.SUPER_ADMIN),
-  // upload.single('file'),
-  // (req: Request, res: Response, next: NextFunction) => {
-  //   req.body = JSON.parse(req.body.data);
-  //   next();
-  // },
   validationRequest(stakeholderValidation.createStakeholderValidation),
   userController.createStackHolder,
 );
@@ -25,11 +19,6 @@ route.post(
 route.post(
   '/create-seller',
   auth(ACCESS_ROLE.SUPER_ADMIN, ACCESS_ROLE.ADMIN),
-  // upload.single('file'),
-  // (req: Request, res: Response, next: NextFunction) => {
-  //   req.body = JSON.parse(req.body.data);
-  //   next();
-  // },
   validationRequest(sellerValidation.createSellerValidation),
   userController.createSeller,
 );
@@ -48,7 +37,7 @@ route.get(
 );
 
 route.get(
-  '/single-user/:id',
+  '/single-user/:slug',
   auth(
     ACCESS_ROLE.SUPER_ADMIN,
     ACCESS_ROLE.ADMIN,

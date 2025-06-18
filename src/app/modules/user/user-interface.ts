@@ -15,6 +15,7 @@ export interface TUser {
   password: string;
   isPasswordChanged: boolean;
   passwordChangeAt?: Date;
+  slug?: string;
   isDeleted: boolean;
 }
 

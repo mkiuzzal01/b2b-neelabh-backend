@@ -144,6 +144,7 @@ const allProductFromBD = async (query: Record<string, unknown>) => {
       { path: 'categories.mainCategory' },
       { path: 'categories.category' },
       { path: 'categories.subCategory' },
+      { path: 'Photo' },
     ]),
     query,
   )
@@ -163,6 +164,7 @@ const singleProductFromDB = async (id: string) => {
     { path: 'categories.mainCategory' },
     { path: 'categories.category' },
     { path: 'categories.subCategory' },
+    { path: 'Photo' },
   ]);
   return result;
 };

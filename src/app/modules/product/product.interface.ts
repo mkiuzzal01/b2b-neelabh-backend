@@ -21,9 +21,9 @@ export type TProduct = {
   creatorId?: Types.ObjectId;
   productCode: string;
   title: string;
+  subTitle?: string;
   totalQuantity: number;
   slug?: string;
-  subTitle?: string;
   variants: TProductVariant[];
   price: number;
   discount: number;
@@ -33,5 +33,7 @@ export type TProduct = {
   description: string;
   status: TStatus;
   activity: TActivity;
+  optionalLinks?: string;
+  productImage: Types.ObjectId;
   isDeleted: boolean;
 };
