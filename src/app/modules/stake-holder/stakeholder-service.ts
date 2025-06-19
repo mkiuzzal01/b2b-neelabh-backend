@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import status from 'http-status';
 import AppError from '../../errors/AppError';
 import { TStakeHolder } from './stakeholder-interface';
@@ -22,7 +23,9 @@ const allStakeholdersFromDB = async (query: Record<string, unknown>) => {
 };
 
 const singleStakeholderFromDB = async (id: string) => {
-  const result = await Stakeholder.findById(id).populate('userId');
+  const result = await Stakeholder.findOne({ userId: id })
+    .populate('creator')
+    .populate('userId');
   if (!result) {
     throw new AppError(status.NOT_FOUND, 'This is stake holder not found');
   }

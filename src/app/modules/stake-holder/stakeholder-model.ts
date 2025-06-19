@@ -31,8 +31,9 @@ const stakeholderNameSchema = new Schema<TStakeHolderName>({
 
 const stakeholderSchema = new Schema<TStakeHolder>(
   {
-    creatorId: {
-      type: String,
+    creator: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
     },
     userId: {
       type: Schema.Types.ObjectId,

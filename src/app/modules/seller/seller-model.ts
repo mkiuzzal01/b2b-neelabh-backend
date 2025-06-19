@@ -5,6 +5,10 @@ import slugify from 'slugify';
 
 const sellerSchema = new Schema<TSeller>(
   {
+    creator: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+    },
     userId: {
       type: Schema.Types.ObjectId,
       ref: 'User',
@@ -65,7 +69,7 @@ const sellerSchema = new Schema<TSeller>(
 );
 
 // virtual
-sellerSchema.virtual('fullName').get(function () {
+sellerSchema.virtual('fullName').get(function (this: TSeller) {
   return `${this?.name?.firstName} ${this?.name?.middleName} ${this?.name?.lastName}`;
 });
 

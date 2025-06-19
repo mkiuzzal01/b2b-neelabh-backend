@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { gender } from '../stake-holder/stakeholder-constant';
 import { bankName, paymentMethod } from './seller-constant';
+import { profileStatus, role } from '../user/user-constant';
 
 const nameSchema = z.object({
   firstName: z.string({ required_error: 'First name is required' }),
@@ -50,6 +51,8 @@ const sellerBaseSchema = z.object({
     url: z.string(),
   }),
   isDeleted: z.boolean().default(false).optional(),
+  profileStatus: z.enum(profileStatus).optional(),
+  role: z.enum(role).optional(),
 });
 
 const createSellerValidation = z.object({

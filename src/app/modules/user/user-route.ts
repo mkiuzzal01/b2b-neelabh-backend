@@ -35,9 +35,8 @@ route.get(
   auth(ACCESS_ROLE.SUPER_ADMIN, ACCESS_ROLE.ADMIN),
   userController.allUsers,
 );
-
 route.get(
-  '/single-user/:slug',
+  '/single-user-with-id/:id',
   auth(
     ACCESS_ROLE.SUPER_ADMIN,
     ACCESS_ROLE.ADMIN,
@@ -45,7 +44,19 @@ route.get(
     ACCESS_ROLE.PRODUCT_MANAGER,
     ACCESS_ROLE.SELLER,
   ),
-  userController.singleUser,
+  userController.singleUserById,
+);
+
+route.get(
+  '/single-user-with-slug/:slug',
+  auth(
+    ACCESS_ROLE.SUPER_ADMIN,
+    ACCESS_ROLE.ADMIN,
+    ACCESS_ROLE.ACCOUNTANT,
+    ACCESS_ROLE.PRODUCT_MANAGER,
+    ACCESS_ROLE.SELLER,
+  ),
+  userController.singleUserBySlug,
 );
 
 route.get(

@@ -5,6 +5,7 @@ import { TSeller } from './seller-interface';
 import { BankAccount } from '../user/user-model';
 import QueryBuilder from '../../builder/QueryBuilder';
 import { sellerSearchableField } from './seller-constant';
+import { Stakeholder } from '../stake-holder/stakeholder-model';
 
 const allSellersFromDB = async (query: Record<string, unknown>) => {
   const queryBuilder = new QueryBuilder(
@@ -23,12 +24,22 @@ const allSellersFromDB = async (query: Record<string, unknown>) => {
 };
 
 const singleSellerFromDB = async (id: string) => {
-  const result = await Seller.findOne({ userId: id })
-    .populate('userId')
-    .populate('bankAccountInfo');
-  if (!result) {
-    throw new AppError(status.NOT_FOUND, 'This is seller not found');
+  const seller = await Seller.findOne({ userId: id })
+    .populate('creator', 'email role status')
+    .populate('userId', 'email role status')
+    .populate('bankAccountInfo' )
+    .lean();
+
+  if (!seller) {
+    throw new AppError(status.NOT_FOUND, 'Seller not found');
   }
+
+  const creatorProfile = await Stakeholder.findOne({
+    userId: seller.creator as string,
+  })
+    .select('name email phone')
+    .lean();
+  const result = { ...seller, creatorProfile };
   return result;
 };
 

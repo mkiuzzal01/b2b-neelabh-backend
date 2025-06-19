@@ -14,7 +14,7 @@ export type TName = {
 };
 
 export type TSeller = {
-  creatorId?: string;
+  creator?: string;
   userId: Types.ObjectId;
   name: TName;
   slug?: string;

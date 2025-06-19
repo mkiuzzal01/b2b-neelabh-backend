@@ -14,7 +14,7 @@ export type TStakeHolderName = {
 };
 
 export type TStakeHolder = {
-  creatorId?: string;
+  creator?: string;
   userId?: Types.ObjectId;
   name: TStakeHolderName;
   slug?: string;

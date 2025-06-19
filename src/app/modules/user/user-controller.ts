@@ -13,7 +13,6 @@ const createStackHolder: RequestHandler = catchAsync(async (req, res) => {
     role,
     stakeholder,
     creator,
-    // file,
   );
   sendResponse(res, {
     statusCode: status.OK,
@@ -63,9 +62,20 @@ const allUsers: RequestHandler = catchAsync(async (req, res) => {
   });
 });
 
-const singleUser: RequestHandler = catchAsync(async (req, res) => {
+const singleUserBySlug: RequestHandler = catchAsync(async (req, res) => {
   const { slug } = req.params;
-  const result = await userService.singleUserFromDB(slug);
+  const result = await userService.singleUserBySlugFromDB(slug);
+  sendResponse(res, {
+    statusCode: status.OK,
+    success: true,
+    message: 'user retrieve successfully',
+    data: result,
+  });
+});
+
+const singleUserById: RequestHandler = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const result = await userService.singleUserByIdFromDB(id);
   sendResponse(res, {
     statusCode: status.OK,
     success: true,
@@ -100,7 +110,8 @@ export const userController = {
   createSeller,
   updatedSeller,
   allUsers,
-  singleUser,
+  singleUserById,
+  singleUserBySlug,
   adminDashboardOverview,
   sellerDashboardOverview,
 };

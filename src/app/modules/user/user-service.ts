@@ -9,15 +9,12 @@ import { TStakeHolder } from '../stake-holder/stakeholder-interface';
 import AppError from '../../errors/AppError';
 import status from 'http-status';
 import { Seller } from '../seller/seller-model';
-// import { sendImageToCloudinary } from '../../utils/sendImageToCloudinary';
-// import { UploadApiResponse } from 'cloudinary';
 
 const createStackHolderBD = async (
   password: string,
   role: TRole,
   payload: TStakeHolder,
   creator: string,
-  // file: any,
 ) => {
   const session = await mongoose.startSession();
   session.startTransaction();
@@ -34,23 +31,9 @@ const createStackHolderBD = async (
       throw new AppError(status.BAD_REQUEST, 'Failed to create user');
     }
 
-    // upload image to cloudinary :
-    // if (file) {
-    //   const { path } = file;
-    //   const imageName = `${payload.name.firstName}${userData.email}${payload.name.middleName}${payload.name.lastName}`;
-    //   const { secure_url, public_id } = (await sendImageToCloudinary(
-    //     imageName,
-    //     path,
-    //   )) as UploadApiResponse;
-    //   payload.profileImage = {
-    //     publicId: public_id as string,
-    //     url: secure_url as string,
-    //   };
-    // }
-
     //create the stakeholder:
     payload.userId = newUser[0]._id as any;
-    payload.creatorId = creator;
+    payload.creator = creator;
 
     const newAdmin = await Stakeholder.create([payload], { session });
     if (!newAdmin.length) {
@@ -109,7 +92,7 @@ const createSellerIntoBD = async (
     //create the seller:
     payload.userId = createdUser._id as any;
     payload.bankAccountInfo = createdBankAccount._id;
-    payload.creatorId = creator;
+    payload.creator = creator;
 
     const newSeller = await Seller.create([payload], { session });
     if (!newSeller.length) {
@@ -145,14 +128,23 @@ const allUserFromDB = async () => {
   return result;
 };
 
-// get user from db:
-const singleUserFromDB = async (slug: string) => {
+// get user from db use by slug:
+const singleUserBySlugFromDB = async (slug: string) => {
   const result = await User.findOne({ slug });
   if (!result) {
     throw new AppError(status.NOT_FOUND, 'this user not found');
   }
   return result;
 };
+
+const singleUserByIdFromDB = async (id: string) => {
+  const result = await User.findById(id);
+  if (!result) {
+    throw new AppError(status.NOT_FOUND, 'this user not found');
+  }
+  return result;
+};
+
 // this is service for overview :
 const adminDashboardOverviewFromDB = async () => {
   try {
@@ -316,7 +308,8 @@ export const userService = {
   createSellerIntoBD,
   updateUserIntoDB,
   allUserFromDB,
-  singleUserFromDB,
+  singleUserBySlugFromDB,
+  singleUserByIdFromDB,
   adminDashboardOverviewFromDB,
   sellerDashboardOverviewFromDB,
 };
