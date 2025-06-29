@@ -1,7 +1,7 @@
 import { z } from 'zod';
-import { gender } from '../stake-holder/stakeholder-constant';
-import { bankName, paymentMethod } from './seller-constant';
-import { profileStatus, role } from '../user/user-constant';
+import { gender } from '../stake-holder/stakeholder.constant';
+import { bankName, paymentMethod } from './seller.constant';
+import { profileStatus, role } from '../user/user.constant';
 
 const nameSchema = z.object({
   firstName: z.string({ required_error: 'First name is required' }),

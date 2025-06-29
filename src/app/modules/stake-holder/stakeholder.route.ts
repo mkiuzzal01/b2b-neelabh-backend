@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { stakeholderController } from './stakeholder-controller';
+import { stakeholderController } from './stakeholder.controller';
 import validationRequest from '../../middlewares/validationRequest';
-import { stakeholderValidation } from './stakeholder-validation';
+import { stakeholderValidation } from './stakeholder.validation';
 
 const router = Router();
 router.get('/all-stakeholder', stakeholderController.getAllStakeholder);

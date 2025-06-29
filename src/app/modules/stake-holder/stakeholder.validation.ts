@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { gender } from './stakeholder-constant';
+import { gender } from './stakeholder.constant';
 
 const nameSchema = z.object({
   firstName: z

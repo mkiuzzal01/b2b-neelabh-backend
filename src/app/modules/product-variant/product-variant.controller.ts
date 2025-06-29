@@ -1,6 +1,6 @@
 import { Request, RequestHandler, Response } from 'express';
 import catchAsync from '../utils/catchAsync';
-import { ProductVariantService } from './product-variant-service';
+import { ProductVariantService } from './product-variant.service';
 import sendResponse from '../utils/sendResponse';
 import status from 'http-status';
 

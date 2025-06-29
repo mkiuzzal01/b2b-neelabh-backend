@@ -1,3 +1,4 @@
+export const userSearchableField = ['email', 'role'];
 export const profileStatus = [
   'active',
   'inactive',

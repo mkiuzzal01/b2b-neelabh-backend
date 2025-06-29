@@ -9,7 +9,7 @@ import {
   allowedStatusTransitions,
   orderSearchableField,
 } from './order.constant';
-import { BankAccount } from '../user/user-model';
+import { BankAccount } from '../user/user.model';
 import QueryBuilder from '../../builder/QueryBuilder';
 
 const allOrderFromDB = async (query: Record<string, unknown>) => {

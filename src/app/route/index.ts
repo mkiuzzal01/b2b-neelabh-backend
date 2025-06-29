@@ -1,9 +1,9 @@
 import { Router } from 'express';
-import { userRoute } from '../modules/user/user-route';
-import { stakeholderRoute } from '../modules/stake-holder/stakeholder-route';
-import { sellerRoute } from '../modules/seller/seller-route';
+import { userRoute } from '../modules/user/user.route';
+import { stakeholderRoute } from '../modules/stake-holder/stakeholder.route';
+import { sellerRoute } from '../modules/seller/seller.route';
 import { categoryRoute } from '../modules/category/category.route';
-import { productVariantRoute } from '../modules/product-variant/product-variant-route';
+import { productVariantRoute } from '../modules/product-variant/product-variant.route';
 import { ProductRoute } from '../modules/product/product.route';
 import { noticeRouter } from '../modules/notice/notice.route';
 import {

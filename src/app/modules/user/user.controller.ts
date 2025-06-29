@@ -1,6 +1,6 @@
 import { RequestHandler } from 'express';
 import sendResponse from '../utils/sendResponse';
-import { userService } from './user-service';
+import { userService } from './user.service';
 import catchAsync from '../utils/catchAsync';
 import status from 'http-status';
 
@@ -40,10 +40,10 @@ const createSeller: RequestHandler = catchAsync(async (req, res) => {
   });
 });
 
-const updatedSeller: RequestHandler = catchAsync(async (req, res) => {
-  const creator = req.params.id;
+const updatedUser: RequestHandler = catchAsync(async (req, res) => {
+  const { id } = req.params;
   const payload = req.body;
-  const result = await userService.updateUserIntoDB(payload, creator);
+  const result = await userService.updateUserIntoDB(payload, id);
   sendResponse(res, {
     statusCode: status.OK,
     success: true,
@@ -53,7 +53,8 @@ const updatedSeller: RequestHandler = catchAsync(async (req, res) => {
 });
 
 const allUsers: RequestHandler = catchAsync(async (req, res) => {
-  const result = await userService.allUserFromDB();
+  const { query } = req;
+  const result = await userService.allUserFromDB(query);
   sendResponse(res, {
     statusCode: status.OK,
     success: true,
@@ -108,7 +109,7 @@ const sellerDashboardOverview: RequestHandler = catchAsync(async (req, res) => {
 export const userController = {
   createStackHolder,
   createSeller,
-  updatedSeller,
+  updatedUser,
   allUsers,
   singleUserById,
   singleUserBySlug,

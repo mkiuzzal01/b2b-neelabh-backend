@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import validationRequest from '../../middlewares/validationRequest';
-import { ProductVariantValidation } from './product-variant-validation';
-import { productVariantController } from './product-variant-controller';
+import { ProductVariantValidation } from './product-variant.validation';
+import { productVariantController } from './product-variant.controller';
 
 const router = Router();
 

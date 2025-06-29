@@ -1,6 +1,6 @@
 import { model, Schema } from 'mongoose';
-import { TBankAccountInfo, TUser, UserModel } from './user-interface';
-import { profileStatus, role } from './user-constant';
+import { TBankAccountInfo, TUser, UserModel } from './user.interface';
+import { profileStatus, role } from './user.constant';
 import bcrypt from 'bcrypt';
 import config from '../../config';
 import slugify from 'slugify';

@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import validationRequest from '../../middlewares/validationRequest';
-import { sellerValidation } from './seller-validation';
-import { sellerController } from './seller-controller';
+import { sellerValidation } from './seller.validation';
+import { sellerController } from './seller.controller';
 
 const router = Router();
 

@@ -1,6 +1,6 @@
 import status from 'http-status';
 import AppError from '../../errors/AppError';
-import { User } from '../user/user-model';
+import { User } from '../user/user.model';
 import { TLoginUser } from './auth.interface';
 import config from '../../config';
 import { createToken, verifyToken } from '../utils/token';

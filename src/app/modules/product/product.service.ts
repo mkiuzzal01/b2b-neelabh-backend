@@ -8,7 +8,7 @@ import {
   SubCategory,
 } from '../category/category.model';
 import mongoose from 'mongoose';
-import { ProductVariant } from '../product-variant/product-variant-model';
+import { ProductVariant } from '../product-variant/product-variant.model';
 import QueryBuilder from '../../builder/QueryBuilder';
 import { productSearchableField } from './product.constant';
 

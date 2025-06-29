@@ -1,6 +1,6 @@
 import { model, Schema } from 'mongoose';
-import { TSeller } from './seller-interface';
-import { gender } from '../stake-holder/stakeholder-constant';
+import { TSeller } from './seller.interface';
+import { gender } from '../stake-holder/stakeholder.constant';
 import slugify from 'slugify';
 
 const sellerSchema = new Schema<TSeller>(

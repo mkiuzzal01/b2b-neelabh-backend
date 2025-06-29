@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import status from 'http-status';
 import AppError from '../../errors/AppError';
-import { ProductVariant } from './product-variant-model';
+import { ProductVariant } from './product-variant.model';
 import { TProductVariant } from './product-variant.interface';
 
 //get the all  product info:

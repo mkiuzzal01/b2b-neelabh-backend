@@ -1,14 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import mongoose from 'mongoose';
-import { TBankAccountInfo, TRole, TUser } from './user-interface';
+import { TBankAccountInfo, TRole, TUser } from './user.interface';
 import config from '../../config';
-import { BankAccount, User } from './user-model';
-import { Stakeholder } from '../stake-holder/stakeholder-model';
-import { TSeller } from '../seller/seller-interface';
-import { TStakeHolder } from '../stake-holder/stakeholder-interface';
+import { BankAccount, User } from './user.model';
+import { Stakeholder } from '../stake-holder/stakeholder.model';
+import { TSeller } from '../seller/seller.interface';
+import { TStakeHolder } from '../stake-holder/stakeholder.interface';
 import AppError from '../../errors/AppError';
 import status from 'http-status';
-import { Seller } from '../seller/seller-model';
+import { Seller } from '../seller/seller.model';
+import QueryBuilder from '../../builder/QueryBuilder';
+import { userSearchableField } from './user.constant';
 
 const createStackHolderBD = async (
   password: string,
@@ -109,23 +111,72 @@ const createSellerIntoBD = async (
 };
 
 const updateUserIntoDB = async (payload: Partial<TUser>, id: string) => {
-  const existingUser = await User.findById(id);
-  if (!existingUser) {
-    throw new AppError(status.NOT_FOUND, 'User not found');
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    const existingUser = await User.findById(id).session(session);
+    if (!existingUser) {
+      throw new AppError(status.NOT_FOUND, 'User not found');
+    }
+
+    // Update related document based on role
+    if (existingUser.role === 'seller') {
+      const updatedSeller = await Seller.findOneAndUpdate(
+        { userId: id },
+        { isDeleted: payload?.isDeleted },
+        {
+          new: true,
+          runValidators: true,
+          session,
+        },
+      );
+
+      if (!updatedSeller) {
+        throw new AppError(status.NOT_FOUND, 'Seller not found');
+      }
+    } else {
+      const updatedStakeholder = await Stakeholder.findOneAndUpdate(
+        { userId: id },
+        { isDeleted: payload?.isDeleted },
+        {
+          new: true,
+          runValidators: true,
+          session,
+        },
+      );
+
+      if (!updatedStakeholder) {
+        throw new AppError(status.NOT_FOUND, 'Stakeholder not found');
+      }
+    }
+
+    // Update main User document
+    const updatedUser = await User.findByIdAndUpdate(id, payload, {
+      new: true,
+      runValidators: true,
+      session,
+    });
+
+    await session.commitTransaction();
+    return updatedUser;
+  } catch (error) {
+    await session.abortTransaction();
+    throw error;
+  } finally {
+    session.endSession();
   }
-
-  const updatedUser = await User.findByIdAndUpdate(id, payload, {
-    new: true,
-    runValidators: true,
-  });
-
-  return updatedUser;
 };
 
 //get all user form db:
-const allUserFromDB = async () => {
-  const result = await User.find();
-  return result;
+const allUserFromDB = async (query: Record<string, unknown>) => {
+  const userQuery = new QueryBuilder(User.find(), query).search(
+    userSearchableField,
+  );
+
+  const meta = await userQuery.countTotal();
+  const result = await userQuery.modelQuery;
+  return { meta, result };
 };
 
 // get user from db use by slug:

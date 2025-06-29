@@ -1,5 +1,5 @@
 import { RequestHandler } from 'express';
-import { stakeholderService } from './stakeholder-service';
+import { stakeholderService } from './stakeholder.service';
 import sendResponse from '../utils/sendResponse';
 import { status } from 'http-status';
 

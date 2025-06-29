@@ -1,6 +1,6 @@
 import config from '../../config';
 import { ACCESS_ROLE } from '../../interface/AccessRole';
-import { User } from '../user/user-model';
+import { User } from '../user/user.model';
 
 const superUser = {
   email: config.super_admin_email,

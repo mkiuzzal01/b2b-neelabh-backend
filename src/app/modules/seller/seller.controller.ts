@@ -1,6 +1,6 @@
 import { Request, RequestHandler, Response } from 'express';
 import sendResponse from '../utils/sendResponse';
-import { sellerService } from './seller-service';
+import { sellerService } from './seller.service';
 import status from 'http-status';
 
 const allSeller: RequestHandler = async (req: Request, res: Response) => {
@@ -28,8 +28,6 @@ const singleSeller: RequestHandler = async (req: Request, res: Response) => {
 const updateSeller: RequestHandler = async (req: Request, res: Response) => {
   const { id } = req.params;
   const data = req.body;
-  console.log(id);
-  console.log(data);
   const result = await sellerService.updateSellerIntoDB(id, data);
   sendResponse(res, {
     statusCode: status.OK,

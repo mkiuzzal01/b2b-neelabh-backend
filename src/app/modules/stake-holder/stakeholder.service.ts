@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import status from 'http-status';
 import AppError from '../../errors/AppError';
-import { TStakeHolder } from './stakeholder-interface';
-import { Stakeholder } from './stakeholder-model';
+import { TStakeHolder } from './stakeholder.interface';
+import { Stakeholder } from './stakeholder.model';
 import QueryBuilder from '../../builder/QueryBuilder';
-import { searchableFields } from './stakeholder-constant';
+import { searchableFields } from './stakeholder.constant';
 
 const allStakeholdersFromDB = async (query: Record<string, unknown>) => {
   const queryBuilder = new QueryBuilder(

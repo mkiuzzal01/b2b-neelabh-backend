@@ -1,7 +1,7 @@
 import { model, Schema } from 'mongoose';
-import { gender } from './stakeholder-constant';
+import { gender } from './stakeholder.constant';
 import validator from 'validator';
-import { TStakeHolder, TStakeHolderName } from './stakeholder-interface';
+import { TStakeHolder, TStakeHolderName } from './stakeholder.interface';
 import slugify from 'slugify';
 
 const stakeholderNameSchema = new Schema<TStakeHolderName>({

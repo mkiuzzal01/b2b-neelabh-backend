@@ -1,11 +1,11 @@
 import { Router } from 'express';
-import { userController } from './user-controller';
+import { userController } from './user.controller';
 import validationRequest from '../../middlewares/validationRequest';
-import { stakeholderValidation } from '../stake-holder/stakeholder-validation';
-import { sellerValidation } from '../seller/seller-validation';
+import { stakeholderValidation } from '../stake-holder/stakeholder.validation';
+import { sellerValidation } from '../seller/seller.validation';
 import { auth } from '../../middlewares/auth';
 import { ACCESS_ROLE } from '../../interface/AccessRole';
-import { userValidation } from './user-validation';
+import { userValidation } from './user.validation';
 
 const route = Router();
 
@@ -27,7 +27,7 @@ route.patch(
   '/update-user/:id',
   auth(ACCESS_ROLE.SUPER_ADMIN),
   validationRequest(userValidation.updateUserValidationSchema),
-  userController.updatedSeller,
+  userController.updatedUser,
 );
 
 route.get(

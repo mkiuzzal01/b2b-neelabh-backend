@@ -1,11 +1,12 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import status from 'http-status';
 import AppError from '../../errors/AppError';
-import { Seller } from './seller-model';
-import { TSeller } from './seller-interface';
-import { BankAccount } from '../user/user-model';
+import { Seller } from './seller.model';
+import { TSeller } from './seller.interface';
+import { BankAccount } from '../user/user.model';
 import QueryBuilder from '../../builder/QueryBuilder';
-import { sellerSearchableField } from './seller-constant';
-import { Stakeholder } from '../stake-holder/stakeholder-model';
+import { sellerSearchableField } from './seller.constant';
+import { Stakeholder } from '../stake-holder/stakeholder.model';
 
 const allSellersFromDB = async (query: Record<string, unknown>) => {
   const queryBuilder = new QueryBuilder(
@@ -27,7 +28,7 @@ const singleSellerFromDB = async (id: string) => {
   const seller = await Seller.findOne({ userId: id })
     .populate('creator', 'email role status')
     .populate('userId', 'email role status')
-    .populate('bankAccountInfo' )
+    .populate('bankAccountInfo')
     .lean();
 
   if (!seller) {
@@ -44,40 +45,44 @@ const singleSellerFromDB = async (id: string) => {
 };
 
 const updateSellerIntoDB = async (id: string, payload: Partial<TSeller>) => {
-  const existingSeller = await Seller.findById(id);
+  const existingSeller = await Seller.findOne({ userId: id });
   if (!existingSeller) {
     throw new AppError(status.NOT_FOUND, 'This seller not found');
   }
 
   const updateFields: any = {};
 
-  if (payload.name) {
-    if (payload.name.firstName)
-      updateFields['name.firstName'] = payload.name.firstName;
+  if (payload?.name) {
+    if (existingSeller?.name?.firstName)
+      updateFields['name.firstName'] = payload?.name?.firstName;
 
-    if (payload.name.middleName)
-      updateFields['name.middleName'] = payload.name.middleName;
+    if (existingSeller?.name?.middleName)
+      updateFields['name.middleName'] = payload?.name?.middleName;
 
-    if (payload.name.lastName)
-      updateFields['name.lastName'] = payload.name.lastName;
+    if (existingSeller?.name?.lastName)
+      updateFields['name.lastName'] = payload?.name?.lastName;
   }
 
-  if (payload.phone) {
-    updateFields['phone'] = payload.phone;
+  if (existingSeller?.phone) {
+    updateFields['phone'] = payload?.phone;
   }
 
-  if (payload.address?.presentAddress) {
-    updateFields['address.presentAddress'] = payload.address.presentAddress;
+  if (existingSeller?.address?.presentAddress) {
+    updateFields['address.presentAddress'] = payload?.address?.presentAddress;
   }
 
-  if (payload.profileImageUrl) {
-    updateFields['profileImageUrl'] = payload.profileImageUrl;
+  if (existingSeller?.profileImage) {
+    updateFields['profileImageUrl'] = payload?.profileImage;
   }
 
-  const updatedSeller = await Seller.findByIdAndUpdate(id, updateFields, {
-    new: true,
-    runValidators: true,
-  });
+  const updatedSeller = await Seller.findOneAndUpdate(
+    { userId: id },
+    updateFields,
+    {
+      new: true,
+      runValidators: true,
+    },
+  );
 
   return updatedSeller;
 };

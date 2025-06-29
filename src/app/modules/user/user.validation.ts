@@ -1,5 +1,5 @@
-import { z } from 'zod';
-import { profileStatus, role } from './user-constant';
+import { boolean, z } from 'zod';
+import { profileStatus, role } from './user.constant';
 
 const createUserValidationSchema = z.object({
   body: z.object({
@@ -17,7 +17,11 @@ const createUserValidationSchema = z.object({
 
 const updateUserValidationSchema = z.object({
   body: z.object({
-    status: z.enum(profileStatus, { required_error: 'user status is require' }),
+    role: z.enum(role, { required_error: 'Role is required' }).optional(),
+    status: z
+      .enum(profileStatus, { required_error: 'user status is require' })
+      .optional(),
+    isDeleted: boolean().optional(),
   }),
 });
 
