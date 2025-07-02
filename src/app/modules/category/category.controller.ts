@@ -131,8 +131,9 @@ const createSubCategory: RequestHandler = catchAsync(async (req, res) => {
   });
 });
 
-const getAllSubCategories: RequestHandler = catchAsync(async (_req, res) => {
-  const result = await categoryService.getAllSubCategoryFromDB();
+const getAllSubCategories: RequestHandler = catchAsync(async (req, res) => {
+  const { query } = req;
+  const result = await categoryService.getAllSubCategoryFromDB(query);
   sendResponse(res, {
     statusCode: status.OK,
     success: true,

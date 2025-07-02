@@ -170,9 +170,10 @@ const updateUserIntoDB = async (payload: Partial<TUser>, id: string) => {
 
 //get all user form db:
 const allUserFromDB = async (query: Record<string, unknown>) => {
-  const userQuery = new QueryBuilder(User.find(), query).search(
-    userSearchableField,
-  );
+  const userQuery = new QueryBuilder(User.find(), query)
+    .search(userSearchableField)
+    .filter()
+    .paginate();
 
   const meta = await userQuery.countTotal();
   const result = await userQuery.modelQuery;

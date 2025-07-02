@@ -4,6 +4,8 @@ import { Category, MainCategory, SubCategory } from './category.model';
 import { TCategory, TMainCategory, TSubCategory } from './category.interface';
 import { startSession, Types } from 'mongoose';
 import slugify from 'slugify';
+import QueryBuilder from '../../builder/QueryBuilder';
+import { subCategorySearchableField } from './category.constant';
 
 // ================= Main Category =================
 
@@ -169,12 +171,18 @@ const deleteCategoryFromDB = async (id: string) => {
 
 // ================= Sub Category =================
 
-const getAllSubCategoryFromDB = async () => {
-  return await SubCategory.find();
+const getAllSubCategoryFromDB = async (query: Record<string, unknown>) => {
+  const subCategoryQuery = new QueryBuilder(SubCategory.find(), query)
+    .search(subCategorySearchableField)
+    .filter()
+    .paginate();
+  const meta = await subCategoryQuery.countTotal();
+  const result = await subCategoryQuery.modelQuery;
+  return { meta, result };
 };
 
-const getSingleSubCategoryFromDB = async (id: string) => {
-  const result = await SubCategory.findById(id);
+const getSingleSubCategoryFromDB = async (slug: string) => {
+  const result = await SubCategory.findOne({ slug });
   if (!result) throw new AppError(status.NOT_FOUND, 'Sub-category not found');
   return result;
 };
@@ -191,27 +199,24 @@ const createSubCategoryIntoDB = async (payload: TSubCategory) => {
 };
 
 const updateSubCategoryIntoDB = async (
-  id: string,
+  slug: string,
   payload: Partial<TSubCategory>,
 ) => {
-  const isExist = await SubCategory.findById(id);
+  const isExist = await SubCategory.findOne({ slug });
   if (!isExist) throw new AppError(status.NOT_FOUND, 'Sub-category not found');
 
-  return await SubCategory.findByIdAndUpdate(
-    id,
-    {
-      ...payload,
-      name: payload.name?.trim().toLocaleLowerCase(),
-      slug: slugify(payload.name as string, { lower: true, strict: true }),
-    },
-    { new: true, runValidators: true },
-  );
+  const result = await SubCategory.findOneAndUpdate({ slug }, payload, {
+    new: true,
+    runValidators: true,
+  });
+
+  return result;
 };
 
-const deleteSubCategoryFromDB = async (id: string) => {
-  const isExist = await SubCategory.findById(id);
+const deleteSubCategoryFromDB = async (slug: string) => {
+  const isExist = await SubCategory.findOne({ slug });
   if (!isExist) throw new AppError(status.NOT_FOUND, 'Sub-category not found');
-  await SubCategory.findByIdAndDelete(id);
+  await SubCategory.findOneAndDelete({ slug });
   return null;
 };
 

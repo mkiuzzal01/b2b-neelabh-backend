@@ -1,7 +1,6 @@
 import { Schema, model } from 'mongoose';
 import slugify from 'slugify';
 import { TSubCategory, TCategory, TMainCategory } from './category.interface';
-
 // SubCategory Schema
 const SubCategorySchema = new Schema<TSubCategory>(
   {
@@ -13,9 +12,24 @@ const SubCategorySchema = new Schema<TSubCategory>(
   },
 );
 
+// Create: Slug before save
 SubCategorySchema.pre('save', function (next) {
   if (this.isModified('name')) {
-    this.slug = slugify(this.name, { lower: true, strict: true });
+    const makeSlug =
+      'h6564gvdewe433vbfdsf' + this.name + 'h234h4cxxz67sdseddferffv';
+    this.slug = slugify(makeSlug, { lower: true, strict: true });
+  }
+  next();
+});
+
+// Update: Slug before update
+SubCategorySchema.pre('findOneAndUpdate', function (next) {
+  const update = this.getUpdate() as any;
+  if (update?.name) {
+    const makeSlug =
+      'h6564gvdewe433vbfdsf' + update.name + 'h234h4cxxz67sdseddferffv';
+    update.slug = slugify(makeSlug, { lower: true, strict: true });
+    this.setUpdate(update);
   }
   next();
 });
@@ -44,8 +58,12 @@ const CategorySchema = new Schema<TCategory>(
 
 CategorySchema.pre('save', function (next) {
   if (this.isModified('name')) {
-    this.name = this.name.toLocaleLowerCase();
-    this.slug = slugify(this.name, { lower: true, strict: true });
+    const makeSlug =
+      'h6564gvdewe433vbfdsf' +
+      this.name +
+      'h234h4cxxz67sdseddferffv' +
+      this.isActive;
+    this.slug = slugify(makeSlug, { lower: true, strict: true });
   }
   next();
 });
@@ -65,7 +83,9 @@ const MainCategorySchema = new Schema<TMainCategory>(
 
 MainCategorySchema.pre('save', function (next) {
   if (this.isModified('name')) {
-    this.slug = slugify(this.name, { lower: true, strict: true });
+    const makeSlug =
+      'h6564gvdewe433vbfdsf' + this.name + 'h234h4cxxz67sdseddferffv';
+    this.slug = slugify(makeSlug, { lower: true, strict: true });
   }
   next();
 });
