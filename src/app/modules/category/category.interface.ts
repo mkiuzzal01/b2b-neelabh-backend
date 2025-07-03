@@ -8,14 +8,13 @@ export interface TSubCategory {
 export interface TCategory {
   name: string;
   slug?: string;
-  subCategory: Types.ObjectId;
-  mainCategory: Types.ObjectId;
-  isActive?: boolean;
 }
 
 export interface TMainCategory {
   name: string;
   image?: string;
+  category: Types.ObjectId[];
+  subCategory?: Types.ObjectId[];
   slug?: string;
-  category?: Types.ObjectId;
+  isActive?: boolean;
 }

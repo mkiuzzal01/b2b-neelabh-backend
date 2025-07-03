@@ -3,19 +3,32 @@ import AppError from '../../errors/AppError';
 import { Category, MainCategory, SubCategory } from './category.model';
 import { TCategory, TMainCategory, TSubCategory } from './category.interface';
 import { startSession, Types } from 'mongoose';
-import slugify from 'slugify';
 import QueryBuilder from '../../builder/QueryBuilder';
-import { subCategorySearchableField } from './category.constant';
+import {
+  mainCategorySearchableField,
+  subCategorySearchableField,
+} from './category.constant';
 
 // ================= Main Category =================
 
-const getAllMainCategoryFromDB = async () => {
-  const result = await MainCategory.find().populate('category');
-  return result;
+const getAllMainCategoryFromDB = async (query: Record<string, unknown>) => {
+  const mainCategoryQuery = new QueryBuilder(MainCategory.find(), query)
+    .search(mainCategorySearchableField)
+    .filter()
+    .paginate();
+
+  const meta = await mainCategoryQuery.countTotal();
+  const result = await mainCategoryQuery.modelQuery
+    .populate('category')
+    .populate('subCategory'); // ✅ include subCategory
+
+  return { meta, result };
 };
 
-const getMainCategoryByIdFromDB = async (id: string) => {
-  const result = await MainCategory.findById(id).populate('category');
+const singleMainCategoryFromDB = async (slug: string) => {
+  const result = await MainCategory.findOne({ slug })
+    .populate('category')
+    .populate('subCategory'); // ✅ include subCategory
   if (!result) throw new AppError(status.NOT_FOUND, 'Main category not found');
   return result;
 };
@@ -27,6 +40,30 @@ const createMainCategoryIntoDB = async (payload: TMainCategory) => {
   if (isExist)
     throw new AppError(status.CONFLICT, 'Main category already exists');
 
+  // Validate category IDs
+  const categoryIds = payload.category || [];
+  for (const catId of categoryIds) {
+    const found = await Category.findById(catId);
+    if (!found) {
+      throw new AppError(
+        status.NOT_FOUND,
+        `Category not found for ID: ${catId}`,
+      );
+    }
+  }
+
+  // ✅ Validate subCategory IDs
+  const subCategoryIds = payload.subCategory || [];
+  for (const subId of subCategoryIds) {
+    const found = await SubCategory.findById(subId);
+    if (!found) {
+      throw new AppError(
+        status.NOT_FOUND,
+        `Sub-category not found for ID: ${subId}`,
+      );
+    }
+  }
+
   return await MainCategory.create({
     ...payload,
     name: payload.name.trim().toLocaleLowerCase(),
@@ -34,51 +71,66 @@ const createMainCategoryIntoDB = async (payload: TMainCategory) => {
 };
 
 const updateMainCategoryIntoDB = async (
-  id: string,
+  slug: string,
   payload: Partial<TMainCategory>,
 ) => {
-  const isExist = await MainCategory.findById(id);
+  const isExist = await MainCategory.findOne({ slug });
   if (!isExist) throw new AppError(status.NOT_FOUND, 'Main category not found');
 
-  return await MainCategory.findByIdAndUpdate(
-    id,
-    {
-      ...payload,
-      name: payload.name?.toLocaleLowerCase(),
-      slug: slugify(payload.name as string, { lower: true, strict: true }),
-    },
-    { new: true, runValidators: true },
-  );
+  // Validate new category IDs if provided
+  if (payload.category?.length) {
+    for (const catId of payload.category) {
+      const found = await Category.findById(catId);
+      if (!found) {
+        throw new AppError(
+          status.NOT_FOUND,
+          `Category not found for ID: ${catId}`,
+        );
+      }
+    }
+  }
+
+  // ✅ Validate new subCategory IDs if provided
+  if (payload.subCategory?.length) {
+    for (const subId of payload.subCategory) {
+      const found = await SubCategory.findById(subId);
+      if (!found) {
+        throw new AppError(
+          status.NOT_FOUND,
+          `Sub-category not found for ID: ${subId}`,
+        );
+      }
+    }
+  }
+
+  const result = await MainCategory.findOneAndUpdate({ slug }, payload, {
+    new: true,
+    runValidators: true,
+  });
+
+  return result;
 };
 
 const deleteMainCategoryFromDB = async (id: string) => {
   const objectId = new Types.ObjectId(id);
-
   const exists = await MainCategory.findById(objectId);
   if (!exists) {
     throw new AppError(status.NOT_FOUND, 'Main category not found');
   }
 
-  // Safely remove the reference
-  await Category.updateMany(
-    { mainCategory: objectId },
-    { $set: { mainCategory: null } },
-  );
-
   await MainCategory.deleteOne({ _id: objectId });
 
   return null;
 };
+
 // ================= Category =================
 
 const getAllCategoryFromDB = async () => {
-  return await Category.find().populate('mainCategory').populate('subCategory');
+  return await Category.find();
 };
 
 const getSingleCategoryFromDB = async (id: string) => {
-  const result = await Category.findById(id)
-    .populate('mainCategory')
-    .populate('subCategory');
+  const result = await Category.findById(id);
   if (!result) throw new AppError(status.NOT_FOUND, 'Category not found');
   return result;
 };
@@ -95,23 +147,15 @@ const createCategoryIntoDB = async (payload: TCategory) => {
 
     if (isExist) throw new AppError(status.CONFLICT, 'Category already exists');
 
-    const isExistMainCategory = await MainCategory.findById(
-      payload.mainCategory,
-    ).session(session);
-
-    if (!isExistMainCategory) {
-      throw new AppError(status.NOT_FOUND, 'Main category not found');
-    }
-
-    const isExistSubCategory = await SubCategory.findById(
-      payload.subCategory,
-    ).session(session);
-
-    if (!isExistSubCategory) {
-      throw new AppError(status.NOT_FOUND, 'Sub category not found');
-    }
-
-    const newCategory = await Category.create([payload], { session });
+    const newCategory = await Category.create(
+      [
+        {
+          ...payload,
+          name: payload.name.trim().toLocaleLowerCase(),
+        },
+      ],
+      { session },
+    );
 
     if (!newCategory?.length) {
       throw new AppError(
@@ -119,12 +163,6 @@ const createCategoryIntoDB = async (payload: TCategory) => {
         'Failed to create category',
       );
     }
-
-    await MainCategory.findByIdAndUpdate(
-      isExistMainCategory._id,
-      { $push: { category: newCategory[0]._id } },
-      { session },
-    );
 
     await session.commitTransaction();
     session.endSession();
@@ -138,33 +176,25 @@ const createCategoryIntoDB = async (payload: TCategory) => {
 };
 
 const updateCategoryIntoBD = async (
-  id: string,
+  slug: string,
   payload: Partial<TCategory>,
 ) => {
-  const isExist = await Category.findById(id);
+  const isExist = await Category.findOne({ slug });
   if (!isExist) throw new AppError(status.NOT_FOUND, 'Category not found');
 
-  return await Category.findByIdAndUpdate(
-    id,
-    {
-      ...payload,
-      name: payload.name?.toLocaleLowerCase(),
-      slug: slugify(payload.name as string, { lower: true, strict: true }),
-    },
-    { new: true, runValidators: true },
-  );
+  return await Category.findOneAndUpdate({ slug }, payload, {
+    new: true,
+    runValidators: true,
+  });
 };
 
 const deleteCategoryFromDB = async (id: string) => {
   const isExist = await Category.findById(id);
   if (!isExist) throw new AppError(status.NOT_FOUND, 'Category not found');
 
-  //delete main category:
-  await MainCategory.findByIdAndUpdate(isExist.mainCategory, {
-    $pull: { category: isExist?._id },
-  });
+  // Remove reference from MainCategory
+  await MainCategory.updateMany({ category: id }, { $pull: { category: id } });
 
-  //delete category:
   await Category.deleteOne({ _id: id });
   return null;
 };
@@ -205,12 +235,10 @@ const updateSubCategoryIntoDB = async (
   const isExist = await SubCategory.findOne({ slug });
   if (!isExist) throw new AppError(status.NOT_FOUND, 'Sub-category not found');
 
-  const result = await SubCategory.findOneAndUpdate({ slug }, payload, {
+  return await SubCategory.findOneAndUpdate({ slug }, payload, {
     new: true,
     runValidators: true,
   });
-
-  return result;
 };
 
 const deleteSubCategoryFromDB = async (slug: string) => {
@@ -226,7 +254,7 @@ export const categoryService = {
   // Main Category
   createMainCategoryIntoDB,
   getAllMainCategoryFromDB,
-  getMainCategoryByIdFromDB,
+  singleMainCategoryFromDB,
   updateMainCategoryIntoDB,
   deleteMainCategoryFromDB,
 

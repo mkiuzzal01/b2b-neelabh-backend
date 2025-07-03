@@ -1,7 +1,7 @@
 import { RequestHandler } from 'express';
 import catchAsync from '../utils/catchAsync';
 import status from 'http-status';
-import { categoryService } from '../category/category.service';
+import { categoryService } from './category.service';
 import sendResponse from '../utils/sendResponse';
 
 // =================== Main Category Controllers ===================
@@ -17,8 +17,8 @@ const createMainCategory: RequestHandler = catchAsync(async (req, res) => {
   });
 });
 
-const getAllMainCategories: RequestHandler = catchAsync(async (_req, res) => {
-  const result = await categoryService.getAllMainCategoryFromDB();
+const getAllMainCategories: RequestHandler = catchAsync(async (req, res) => {
+  const result = await categoryService.getAllMainCategoryFromDB(req.query);
   sendResponse(res, {
     statusCode: status.OK,
     success: true,
@@ -27,9 +27,9 @@ const getAllMainCategories: RequestHandler = catchAsync(async (_req, res) => {
   });
 });
 
-const getSingleMainCategory: RequestHandler = catchAsync(async (req, res) => {
-  const { id } = req.params;
-  const result = await categoryService.getMainCategoryByIdFromDB(id);
+const singleMainCategory: RequestHandler = catchAsync(async (req, res) => {
+  const { slug } = req.params;
+  const result = await categoryService.singleMainCategoryFromDB(slug);
   sendResponse(res, {
     statusCode: status.OK,
     success: true,
@@ -39,9 +39,9 @@ const getSingleMainCategory: RequestHandler = catchAsync(async (req, res) => {
 });
 
 const updateMainCategory: RequestHandler = catchAsync(async (req, res) => {
-  const { id } = req.params;
+  const { slug } = req.params;
   const updates = req.body;
-  const result = await categoryService.updateMainCategoryIntoDB(id, updates);
+  const result = await categoryService.updateMainCategoryIntoDB(slug, updates);
   sendResponse(res, {
     statusCode: status.OK,
     success: true,
@@ -64,8 +64,8 @@ const deleteMainCategory: RequestHandler = catchAsync(async (req, res) => {
 // =================== Category Controllers ===================
 
 const createCategory: RequestHandler = catchAsync(async (req, res) => {
-  const category = req.body;
-  const result = await categoryService.createCategoryIntoDB(category);
+  const data = req.body;
+  const result = await categoryService.createCategoryIntoDB(data);
   sendResponse(res, {
     statusCode: status.CREATED,
     success: true,
@@ -96,9 +96,9 @@ const getSingleCategory: RequestHandler = catchAsync(async (req, res) => {
 });
 
 const updateCategory: RequestHandler = catchAsync(async (req, res) => {
-  const { id } = req.params;
+  const { slug } = req.params;
   const updates = req.body;
-  const result = await categoryService.updateCategoryIntoBD(id, updates);
+  const result = await categoryService.updateCategoryIntoBD(slug, updates);
   sendResponse(res, {
     statusCode: status.OK,
     success: true,
@@ -132,8 +132,7 @@ const createSubCategory: RequestHandler = catchAsync(async (req, res) => {
 });
 
 const getAllSubCategories: RequestHandler = catchAsync(async (req, res) => {
-  const { query } = req;
-  const result = await categoryService.getAllSubCategoryFromDB(query);
+  const result = await categoryService.getAllSubCategoryFromDB(req.query);
   sendResponse(res, {
     statusCode: status.OK,
     success: true,
@@ -143,8 +142,8 @@ const getAllSubCategories: RequestHandler = catchAsync(async (req, res) => {
 });
 
 const getSingleSubCategory: RequestHandler = catchAsync(async (req, res) => {
-  const { id } = req.params;
-  const result = await categoryService.getSingleSubCategoryFromDB(id);
+  const { slug } = req.params;
+  const result = await categoryService.getSingleSubCategoryFromDB(slug);
   sendResponse(res, {
     statusCode: status.OK,
     success: true,
@@ -154,9 +153,9 @@ const getSingleSubCategory: RequestHandler = catchAsync(async (req, res) => {
 });
 
 const updateSubCategory: RequestHandler = catchAsync(async (req, res) => {
-  const { id } = req.params;
+  const { slug } = req.params;
   const updates = req.body;
-  const result = await categoryService.updateSubCategoryIntoDB(id, updates);
+  const result = await categoryService.updateSubCategoryIntoDB(slug, updates);
   sendResponse(res, {
     statusCode: status.OK,
     success: true,
@@ -166,8 +165,8 @@ const updateSubCategory: RequestHandler = catchAsync(async (req, res) => {
 });
 
 const deleteSubCategory: RequestHandler = catchAsync(async (req, res) => {
-  const { id } = req.params;
-  const result = await categoryService.deleteSubCategoryFromDB(id);
+  const { slug } = req.params;
+  const result = await categoryService.deleteSubCategoryFromDB(slug);
   sendResponse(res, {
     statusCode: status.OK,
     success: true,
@@ -180,7 +179,7 @@ export const categoryController = {
   // Main Category
   createMainCategory,
   getAllMainCategories,
-  getSingleMainCategory,
+  singleMainCategory,
   updateMainCategory,
   deleteMainCategory,
 
