@@ -14,6 +14,7 @@ const SubCategorySchema = new Schema<TSubCategory>(
 
 SubCategorySchema.pre('save', function (next) {
   if (this.isModified('name')) {
+    this.name = this.name.toLocaleLowerCase();
     const makeSlug = `h6564gvdewe433vbfdsf${this.name}h234h4cxxz67sdseddferffv`;
     this.slug = slugify(makeSlug, { lower: true, strict: true });
   }
@@ -23,6 +24,7 @@ SubCategorySchema.pre('save', function (next) {
 SubCategorySchema.pre('findOneAndUpdate', function (next) {
   const update = this.getUpdate() as Record<string, unknown>;
   if (update?.name) {
+    update.name = (update.name as string).toLowerCase();
     const makeSlug = `h6564gvdewe433vbfdsf${update.name}h234h4cxxz67sdseddferffv`;
     update.slug = slugify(makeSlug, { lower: true, strict: true });
     this.setUpdate(update);
@@ -41,6 +43,7 @@ const CategorySchema = new Schema<TCategory>(
 
 CategorySchema.pre('save', function (next) {
   if (this.isModified('name')) {
+    this.name = this.name.toLocaleLowerCase();
     const makeSlug = `h6564gvdewe433vbfdsf${this.name}h234h4cxxz67sdseddferffv`;
     this.slug = slugify(makeSlug, { lower: true, strict: true });
   }
@@ -50,6 +53,7 @@ CategorySchema.pre('save', function (next) {
 CategorySchema.pre('findOneAndUpdate', function (next) {
   const update = this.getUpdate() as any;
   if (update?.name) {
+    update.name = update.name.toLocaleLowerCase();
     const makeSlug = `h6564gvdewe433vbfdsf${update.name}h234h4cxxz67sdseddferffv`;
     update.slug = slugify(makeSlug, { lower: true, strict: true });
     this.setUpdate(update);
@@ -60,7 +64,7 @@ CategorySchema.pre('findOneAndUpdate', function (next) {
 // ---------------- MainCategory Schema ----------------
 const MainCategorySchema = new Schema<TMainCategory>(
   {
-    name: { type: String, required: true, trim: true },
+    name: { type: String, required: true, trim: true, lowercase: true },
     image: { type: String },
     slug: { type: String, trim: true, unique: true, lowercase: true },
     category: [
@@ -83,6 +87,7 @@ const MainCategorySchema = new Schema<TMainCategory>(
 
 MainCategorySchema.pre('save', function (next) {
   if (this.isModified('name')) {
+    this.name = this.name.toLocaleLowerCase();
     const makeSlug = `h6564gvdewe433vbfdsf${this.name}h234h4cxxz67sdseddferffv`;
     this.slug = slugify(makeSlug, { lower: true, strict: true });
   }
@@ -92,6 +97,7 @@ MainCategorySchema.pre('save', function (next) {
 MainCategorySchema.pre('findOneAndUpdate', function (next) {
   const update = this.getUpdate() as any;
   if (update?.name) {
+    update.name = update.name.toLocaleLowerCase();
     const makeSlug = `h6564gvdewe433vbfdsf${update.name}h234h4cxxz67sdseddferffv`;
     update.slug = slugify(makeSlug, { lower: true, strict: true });
     this.setUpdate(update);

@@ -74,8 +74,9 @@ const createCategory: RequestHandler = catchAsync(async (req, res) => {
   });
 });
 
-const getAllCategories: RequestHandler = catchAsync(async (_req, res) => {
-  const result = await categoryService.getAllCategoryFromDB();
+const getAllCategories: RequestHandler = catchAsync(async (req, res) => {
+  const { query } = req;
+  const result = await categoryService.getAllCategoryFromDB(query);
   sendResponse(res, {
     statusCode: status.OK,
     success: true,
@@ -85,8 +86,8 @@ const getAllCategories: RequestHandler = catchAsync(async (_req, res) => {
 });
 
 const getSingleCategory: RequestHandler = catchAsync(async (req, res) => {
-  const { id } = req.params;
-  const result = await categoryService.getSingleCategoryFromDB(id);
+  const { slug } = req.params;
+  const result = await categoryService.getSingleCategoryFromDB(slug);
   sendResponse(res, {
     statusCode: status.OK,
     success: true,
@@ -165,8 +166,8 @@ const updateSubCategory: RequestHandler = catchAsync(async (req, res) => {
 });
 
 const deleteSubCategory: RequestHandler = catchAsync(async (req, res) => {
-  const { slug } = req.params;
-  const result = await categoryService.deleteSubCategoryFromDB(slug);
+  const { id } = req.params;
+  const result = await categoryService.deleteSubCategoryFromDB(id);
   sendResponse(res, {
     statusCode: status.OK,
     success: true,

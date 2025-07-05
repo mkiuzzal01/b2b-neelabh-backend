@@ -5,7 +5,7 @@ import { categoryController } from './category.controller';
 
 const router = Router();
 
-// ======================= 🔷 Main Category Routes =======================
+// ======================= Main Category Routes =======================
 
 router.get('/all-main-category', categoryController.getAllMainCategories);
 
@@ -35,7 +35,7 @@ router.delete(
 
 router.get('/all-category', categoryController.getAllCategories);
 
-router.get('/single-category/:id', categoryController.getSingleCategory);
+router.get('/single-category/:slug', categoryController.getSingleCategory);
 
 router.post(
   '/create-category',
@@ -44,7 +44,7 @@ router.post(
 );
 
 router.patch(
-  '/update-category/:id',
+  '/update-category/:slug',
   validationRequest(categoryValidation.updateCategory),
   categoryController.updateCategory,
 );
@@ -72,9 +72,6 @@ router.patch(
   categoryController.updateSubCategory,
 );
 
-router.delete(
-  '/delete-sub-category/:slug',
-  categoryController.deleteSubCategory,
-);
+router.delete('/delete-sub-category/:id', categoryController.deleteSubCategory);
 
 export const categoryRoute = router;

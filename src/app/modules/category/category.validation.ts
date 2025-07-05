@@ -1,16 +1,16 @@
 import { z } from 'zod';
 
-// =================== 🔸 SubCategory Validation ===================
+// =================== SubCategory Validation ===================
 const subCategorySchema = z.object({
   name: z.string().min(1, 'Sub-category name is required'),
 });
 
-// =================== 🔹 Category Validation ===================
+// =================== Category Validation ===================
 const categorySchema = z.object({
   name: z.string().min(1, 'Category name is required'),
 });
 
-// =================== 🔷 MainCategory Validation ===================
+// =================== MainCategory Validation ===================
 const mainCategorySchema = z.object({
   name: z.string().min(1, 'Main category name is required'),
   image: z.string().url('Invalid image URL').optional(),
@@ -23,15 +23,10 @@ const mainCategorySchema = z.object({
   isActive: z.boolean().optional(),
 });
 
-// =================== ✅ Exported Validation Schemas ===================
+// =================== Exported Validation Schemas ===================
 export const categoryValidation = {
-  // CREATE
   createMainCategory: z.object({
-    body: mainCategorySchema.extend({
-      subCategory: z
-        .array(z.string().min(1, 'Each sub-category ID is required'))
-        .min(1, 'At least one sub-category is required'),
-    }),
+    body: mainCategorySchema,
   }),
   createCategory: z.object({
     body: categorySchema,
@@ -40,7 +35,6 @@ export const categoryValidation = {
     body: subCategorySchema,
   }),
 
-  // UPDATE (partial for flexibility)
   updateMainCategory: z.object({
     body: mainCategorySchema.partial(),
   }),
