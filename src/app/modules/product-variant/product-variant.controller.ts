@@ -18,9 +18,10 @@ const createProductVariant: RequestHandler = catchAsync(
   },
 );
 
-const getAllProductVariant: RequestHandler = catchAsync(
+const allProductVariant: RequestHandler = catchAsync(
   async (req: Request, res: Response) => {
-    const result = await ProductVariantService.gelAllProductVariantFromDB();
+    const { query } = req;
+    const result = await ProductVariantService.allProductVariantFromDB(query);
     sendResponse(res, {
       statusCode: status.OK,
       message: 'Variant retrieve successfully',
@@ -30,11 +31,10 @@ const getAllProductVariant: RequestHandler = catchAsync(
   },
 );
 
-const getSingleProductVariant: RequestHandler = catchAsync(
+const singleProductVariant: RequestHandler = catchAsync(
   async (req: Request, res: Response) => {
-    const id = req.params.id;
-    const result =
-      await ProductVariantService.getSingleProductVariantFromDB(id);
+    const { slug } = req.params;
+    const result = await ProductVariantService.singleProductVariantFromDB(slug);
     sendResponse(res, {
       statusCode: status.OK,
       message: 'Single variant updated successfully',
@@ -48,11 +48,10 @@ const updateSingleProductVariant: RequestHandler = async (
   req: Request,
   res: Response,
 ) => {
-  const id = req.params.id;
+  const { slug } = req.params;
   const data = req.body;
-
   const result = await ProductVariantService.updateSingleProductVariantIntoDB(
-    id,
+    slug,
     data,
   );
   sendResponse(res, {
@@ -66,12 +65,8 @@ const updateSingleProductVariant: RequestHandler = async (
 const deleteSingleProductVariant: RequestHandler = catchAsync(
   async (req: Request, res: Response) => {
     const id = req.params.id;
-    const data = req.body;
-
-    const result = await ProductVariantService.deleteSingleProductVariantFromDB(
-      id,
-      data,
-    );
+    const result =
+      await ProductVariantService.deleteSingleProductVariantFromDB(id);
     sendResponse(res, {
       statusCode: status.OK,
       success: true,
@@ -83,8 +78,8 @@ const deleteSingleProductVariant: RequestHandler = catchAsync(
 
 export const productVariantController = {
   createProductVariant,
-  getAllProductVariant,
-  getSingleProductVariant,
+  allProductVariant,
+  singleProductVariant,
   updateSingleProductVariant,
   deleteSingleProductVariant,
 };

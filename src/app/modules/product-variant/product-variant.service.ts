@@ -3,72 +3,69 @@ import status from 'http-status';
 import AppError from '../../errors/AppError';
 import { ProductVariant } from './product-variant.model';
 import { TProductVariant } from './product-variant.interface';
+import QueryBuilder from '../../builder/QueryBuilder';
+import { variantSearchableField } from './product-variant.constant';
 
-//get the all  product info:
-const gelAllProductVariantFromDB = async () => {
-  const result = await ProductVariant.find();
-  return result;
+const allProductVariantFromDB = async (query: Record<string, unknown>) => {
+  const variantQuery = new QueryBuilder(ProductVariant.find().lean(), query)
+    .search(variantSearchableField)
+    .paginate();
+
+  const meta = await variantQuery.countTotal();
+  const result = await variantQuery.modelQuery;
+
+  return { meta, result };
 };
 
-//get the single product info:
-const getSingleProductVariantFromDB = async (id: string) => {
-  const result = await ProductVariant.findById(id);
-  return result;
+const singleProductVariantFromDB = async (slug: string) => {
+  const variant = await ProductVariant.findOne({ slug }).lean();
+  if (!variant) {
+    throw new AppError(status.NOT_FOUND, 'Product Variant not found');
+  }
+  return variant;
 };
 
-//create the product variant:
 const createProductVariantIntoDB = async (payload: TProductVariant) => {
   const isExist = await ProductVariant.findOne({ name: payload.name });
 
   if (isExist) {
-    throw new AppError(status.BAD_REQUEST, 'The product variant already exist');
-  }
-
-  const result = await ProductVariant.create(payload);
-  return result;
-};
-
-//update the product variant:
-const updateSingleProductVariantIntoDB = async (
-  id: string,
-  payload: Partial<TProductVariant>,
-): Promise<TProductVariant | null> => {
-  const existingVariant = await ProductVariant.findById(id);
-
-  if (!existingVariant) {
     throw new AppError(
-      status.NOT_FOUND,
-      `Product Variant with ID ${id} not found`,
+      status.BAD_REQUEST,
+      'The product variant already exists',
     );
   }
 
-  const updateQuery: any = {};
+  const createdVariant = await ProductVariant.create(payload);
+  return createdVariant.toObject();
+};
 
-  // Update name
-  if (payload.name && payload.name.trim() !== '') {
+const updateSingleProductVariantIntoDB = async (
+  slug: string,
+  payload: Partial<TProductVariant>,
+): Promise<TProductVariant | null> => {
+  const existingVariant = await ProductVariant.findOne({ slug });
+
+  if (!existingVariant) {
+    throw new AppError(status.NOT_FOUND, 'Product Variant not found');
+  }
+
+  const updateQuery: Record<string, any> = {};
+
+  if (payload.name?.trim()) {
     updateQuery.name = payload.name.trim().toLowerCase();
   }
 
-  // Add new attributes
-  if (payload.attributes && payload.attributes.length > 0) {
-    const existingAttributes = existingVariant.attributes.map((attr) =>
-      attr.value.toLocaleLowerCase(),
-    );
+  if (Array.isArray(payload.attributes)) {
+    const cleanedAttributes = payload.attributes
+      .map((attr) => attr?.value?.trim().toLowerCase())
+      .filter(Boolean)
+      .map((value) => ({ value }));
 
-    const newAttributes = payload.attributes
-      .map((attr) => attr.value.trim().toLowerCase())
-      .filter((attr) => !existingAttributes.includes(attr))
-      .map((attr) => ({ value: attr }));
-
-    if (newAttributes.length > 0) {
-      updateQuery.$addToSet = {
-        attributes: { $each: newAttributes },
-      };
-    }
+    updateQuery.attributes = cleanedAttributes;
   }
 
-  const updatedVariant = await ProductVariant.findByIdAndUpdate(
-    id,
+  const updatedVariant = await ProductVariant.findOneAndUpdate(
+    { slug },
     updateQuery,
     {
       new: true,
@@ -76,49 +73,23 @@ const updateSingleProductVariantIntoDB = async (
     },
   );
 
-  return updatedVariant;
+  return updatedVariant?.toObject?.() ?? updatedVariant;
 };
 
-//delete the product:
-const deleteSingleProductVariantFromDB = async (
-  id: string,
-  payload: Partial<TProductVariant>,
-) => {
-  const existingVariant = await ProductVariant.findById(id);
-  if (!existingVariant) {
-    throw new AppError(status.NOT_FOUND, 'Product variant not found');
+const deleteSingleProductVariantFromDB = async (id: string) => {
+  const variant = await ProductVariant.findById(id);
+  if (!variant) {
+    throw new AppError(status.NOT_FOUND, 'Product Variant not found');
   }
 
-  if (payload.name && payload.name.trim() !== '') {
-    const deletedVariant = await ProductVariant.findByIdAndDelete(id);
-    return deletedVariant;
-  }
-
-  if (payload.attributes && payload.attributes.length > 0) {
-    const attributeValuesToDelete = payload.attributes.map((attr) =>
-      attr.value.trim().toLowerCase(),
-    );
-
-    await ProductVariant.updateOne(
-      { _id: id },
-      {
-        $pull: {
-          attributes: {
-            value: { $in: attributeValuesToDelete },
-          },
-        },
-      },
-    );
-  }
-
-  const updatedVariant = await ProductVariant.findById(id);
-  return updatedVariant;
+  const deleted = await ProductVariant.findByIdAndDelete(id);
+  return deleted?.toObject?.() ?? deleted;
 };
 
 export const ProductVariantService = {
+  allProductVariantFromDB,
+  singleProductVariantFromDB,
   createProductVariantIntoDB,
-  gelAllProductVariantFromDB,
-  getSingleProductVariantFromDB,
   updateSingleProductVariantIntoDB,
   deleteSingleProductVariantFromDB,
 };

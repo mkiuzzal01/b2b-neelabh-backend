@@ -6,7 +6,7 @@ import { productVariantController } from './product-variant.controller';
 const router = Router();
 
 router.post(
-  '/crate-product-variant',
+  '/create-product-variant',
   validationRequest(
     ProductVariantValidation.createProductVariantValidationSchema,
   ),
@@ -14,24 +14,20 @@ router.post(
 );
 
 router.patch(
-  '/update-product-variant/:id',
+  '/update-product-variant/:slug',
   validationRequest(ProductVariantValidation.updateProductVariantValidation),
   productVariantController.updateSingleProductVariant,
 );
 
-router.get(
-  '/all-product-variant',
-  productVariantController.getAllProductVariant,
-);
+router.get('/all-product-variant', productVariantController.allProductVariant);
 
 router.get(
-  '/get-single-product-variant/:id',
-  productVariantController.getSingleProductVariant,
+  '/single-product-variant/:slug',
+  productVariantController.singleProductVariant,
 );
 
 router.delete(
-  '/delete-single-product-variant/:id',
-  validationRequest(ProductVariantValidation.updateProductVariantValidation),
+  '/delete-product-variant/:id',
   productVariantController.deleteSingleProductVariant,
 );
 
