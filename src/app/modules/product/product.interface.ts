@@ -7,7 +7,7 @@ export type TProductVariant = {
   name: string;
   attributes: {
     value: string;
-    quantity: number;
+    quantity: number | string;
   }[];
 };
 
@@ -22,13 +22,13 @@ export type TProduct = {
   productCode: string;
   title: string;
   subTitle?: string;
-  totalQuantity: number;
+  totalQuantity: number | string;
   slug?: string;
   variants: TProductVariant[];
-  price: number;
-  discount: number;
-  parentageForSeller: number;
-  rating?: number;
+  price: number | string;
+  discount: number | string;
+  parentageForSeller: number | string;
+  rating?: number | string;
   categories: TCategories;
   description: string;
   status: TStatus;

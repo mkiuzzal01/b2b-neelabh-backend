@@ -3,7 +3,7 @@ import { productStatus, productActivity } from './product.constant';
 
 const productAttributeSchema = z.object({
   value: z.string().min(1, 'Attribute value is required'),
-  quantity: z.number().min(0, 'Quantity must be at least 0').optional(),
+  quantity: z.string().min(0, 'Quantity must be at least 0').optional(),
 });
 
 const productVariantSchema = z.object({
@@ -22,14 +22,13 @@ const categoriesSchema = z.object({
 const baseProductSchema = z.object({
   productCode: z.string().min(1, 'Product code is required'),
   title: z.string().min(1, 'Title is required'),
-  totalQuantity: z.number({ required_error: 'Quantity is required' }),
   subTitle: z.string().optional(),
   variants: z
     .array(productVariantSchema)
     .min(1, 'At least one variant is required'),
-  price: z.number().min(0, 'Price must be greater than or equal to 0'),
-  discount: z.number().min(0, 'Discount must be greater than or equal to 0'),
-  parentageForSeller: z.number().min(1, 'Seller percentage is require'),
+  price: z.string().min(0, 'Price must be greater than or equal to 0'),
+  discount: z.string().min(0, 'Discount must be greater than or equal to 0'),
+  parentageForSeller: z.string().min(1, 'Seller percentage is require'),
   rating: z.number().optional(),
   categories: categoriesSchema,
   description: z.string().min(1, 'Description is required'),

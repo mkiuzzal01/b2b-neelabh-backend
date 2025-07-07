@@ -1,7 +1,7 @@
 import { model, Schema } from 'mongoose';
-import { TCategories, TProduct, TProductVariant } from './product.interface';
-import { productActivity, productStatus } from './product.constant';
 import slugify from 'slugify';
+import { TProduct, TProductVariant, TCategories } from './product.interface';
+import { productStatus, productActivity } from './product.constant';
 
 export const categoriesSchema = new Schema<TCategories>(
   {
@@ -26,11 +26,25 @@ export const categoriesSchema = new Schema<TCategories>(
 
 export const variantSchema = new Schema<TProductVariant>(
   {
-    name: { type: String, required: true, lowercase: true },
+    name: {
+      type: String,
+      required: true,
+      lowercase: true,
+      trim: true,
+    },
     attributes: [
       {
-        value: { type: String, required: true, lowercase: true },
-        quantity: { type: Number },
+        value: {
+          type: String,
+          required: true,
+          lowercase: true,
+          trim: true,
+        },
+        quantity: {
+          type: Number,
+          required: true,
+          min: 0,
+        },
       },
     ],
   },
@@ -42,25 +56,21 @@ const productSchema = new Schema<TProduct>(
     creatorId: { type: Schema.Types.ObjectId, ref: 'User' },
     productCode: { type: String, unique: true, required: true },
     title: { type: String, required: true },
-    slug: { type: String },
     subTitle: { type: String },
-    totalQuantity: {
-      type: Number,
-      required: true,
-    },
-    variants: [variantSchema],
+    slug: { type: String },
+    totalQuantity: { type: Number, required: true },
     price: { type: Number, required: true },
     discount: { type: Number, required: true },
     parentageForSeller: { type: Number, required: true, default: 0 },
-    rating: { type: Number },
+    rating: { type: Number, default: 0 },
     categories: categoriesSchema,
+    variants: [variantSchema],
     description: { type: String, required: true },
     status: {
       type: String,
       enum: productStatus,
       default: 'in-stock',
     },
-
     activity: {
       type: String,
       enum: productActivity,
@@ -69,6 +79,7 @@ const productSchema = new Schema<TProduct>(
     optionalLinks: {
       type: String,
       default: '',
+      trim: true,
     },
     productImage: {
       type: Schema.Types.ObjectId,
@@ -83,20 +94,10 @@ const productSchema = new Schema<TProduct>(
 );
 
 productSchema.pre('save', function (next) {
-  if (this.isModified('title')) {
-    const slugText = this.title + this.subTitle + this.description;
+  if (this.isModified('title') || this.isModified('subTitle')) {
+    const slugText = `${this.title || ''} ${this.subTitle || ''} || ''}`;
     this.slug = slugify(slugText, { lower: true, strict: true });
   }
-  next();
-});
-
-variantSchema.pre('save', function (next) {
-  this.name = this.name.toLowerCase();
-  this.attributes = this.attributes.map((attr) => ({
-    ...attr,
-    value: attr.value.toLowerCase(),
-  }));
-
   next();
 });
 

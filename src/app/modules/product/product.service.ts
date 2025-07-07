@@ -12,70 +12,74 @@ import { ProductVariant } from '../product-variant/product-variant.model';
 import QueryBuilder from '../../builder/QueryBuilder';
 import { productSearchableField } from './product.constant';
 
-const createProductIntoBD = async (payload: TProduct, creatorId: string) => {
+export const createProductIntoBD = async (
+  payload: TProduct,
+  creatorId: string,
+) => {
   const session = await mongoose.startSession();
 
   try {
     return await session.withTransaction(async () => {
+      const { productCode, categories, variants } = payload;
+
       const [existingProduct, mainCat, cat, subCat] = await Promise.all([
-        Product.findOne({ productCode: payload.productCode }).session(session),
-        MainCategory.findById(payload.categories.mainCategory).session(session),
-        Category.findById(payload.categories.category).session(session),
-        SubCategory.findById(payload.categories.subCategory).session(session),
+        Product.findOne({ productCode }).session(session),
+        MainCategory.findById(categories.mainCategory).session(session),
+        Category.findById(categories.category).session(session),
+        SubCategory.findById(categories.subCategory).session(session),
       ]);
 
-      if (existingProduct) {
+      if (existingProduct)
         throw new AppError(status.CONFLICT, 'Product code already exists');
-      }
-      if (!mainCat) {
+      if (!mainCat)
         throw new AppError(status.NOT_FOUND, 'Main category not found');
-      }
-      if (!cat) {
-        throw new AppError(status.NOT_FOUND, 'Category not found');
-      }
-      if (!subCat) {
+      if (!cat) throw new AppError(status.NOT_FOUND, 'Category not found');
+      if (!subCat)
         throw new AppError(status.NOT_FOUND, 'Sub-category not found');
-      }
 
-      const sumOfVariants = payload.variants.reduce(
-        (sum, v) =>
-          sum + v.attributes.reduce((s2, attr) => s2 + (attr.quantity ?? 0), 0),
-        0,
-      );
-
-      if (sumOfVariants !== payload.totalQuantity) {
-        throw new AppError(
-          status.BAD_REQUEST,
-          'The product variant and quantities not equal',
+      const totalQuantity = variants.reduce((sum, variant) => {
+        return (
+          sum +
+          variant.attributes.reduce((acc, attr) => {
+            const qty = Number(attr.quantity);
+            if (isNaN(qty) || qty < 0) {
+              throw new AppError(
+                status.BAD_REQUEST,
+                `Invalid quantity "${attr.quantity}" in variant "${variant.name}"`,
+              );
+            }
+            return acc + qty;
+          }, 0)
         );
-      }
+      }, 0);
 
-      const bulkOps = payload.variants.map((variant) => {
-        const name = variant.name.toLowerCase();
-        const attrs = variant.attributes.map((a) => ({
-          value: a.value.toLowerCase(),
-        }));
-
-        return {
-          updateOne: {
-            filter: { name },
-            update: {
-              $setOnInsert: { name },
-              $addToSet: { attributes: { $each: attrs } },
+      const bulkVariantOps = variants.map((variant) => ({
+        updateOne: {
+          filter: { name: variant.name.toLowerCase() },
+          update: {
+            $setOnInsert: { name: variant.name.toLowerCase() },
+            $addToSet: {
+              attributes: {
+                $each: variant.attributes.map((a) => ({
+                  value: a.value.toLowerCase(),
+                })),
+              },
             },
-            upsert: true,
           },
-        };
-      });
+          upsert: true,
+        },
+      }));
 
-      if (bulkOps.length) {
-        await ProductVariant.bulkWrite(bulkOps, { session });
+      if (bulkVariantOps.length > 0) {
+        await ProductVariant.bulkWrite(bulkVariantOps, { session });
       }
 
       const product = new Product({
         ...payload,
+        totalQuantity,
         creatorId: new mongoose.Types.ObjectId(creatorId),
       });
+
       await product.save({ session });
 
       return product;
@@ -144,7 +148,6 @@ const allProductFromBD = async (query: Record<string, unknown>) => {
       { path: 'categories.mainCategory' },
       { path: 'categories.category' },
       { path: 'categories.subCategory' },
-      { path: 'Photo' },
     ]),
     query,
   )
