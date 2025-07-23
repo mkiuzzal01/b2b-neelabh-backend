@@ -1,95 +1,60 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import status from 'http-status';
-import AppError from '../../errors/AppError';
-import { ProductVariant } from './product-variant.model';
-import { TProductVariant } from './product-variant.interface';
-import QueryBuilder from '../../builder/QueryBuilder';
-import { variantSearchableField } from './product-variant.constant';
+// import status from 'http-status';
+// import AppError from '../../errors/AppError';
+// import { ProductVariant } from './product-variant.model';
+// import { TProductVariants } from './product-variant.interface';
 
-const allProductVariantFromDB = async (query: Record<string, unknown>) => {
-  const variantQuery = new QueryBuilder(ProductVariant.find().lean(), query)
-    .search(variantSearchableField)
-    .paginate();
+// const createVariantIntoDB = async (payload: TProductVariants) => {
+//   // console.log(payload);
+//   // const variants = payload.map(variant => ({
+//   //   name: variant.name.toLowerCase().trim(),
+//   //   values: variant.values.map(v => ({ value: v.value.trim() }))
+//   // }));
 
-  const meta = await variantQuery.countTotal();
-  const result = await variantQuery.modelQuery;
+//   // const existingNames = (await ProductVariant.find({
+//   //   name: { $in: variants.map(v => v.name) }
+//   // })).map(v => v.name);
 
-  return { meta, result };
-};
+//   // if (existingNames.length) {
+//   //   throw new AppError(
+//   //     status.CONFLICT,
+//   //     `These variants already exist: ${existingNames.join(', ')}`
+//   //   );
+//   // }
 
-const singleProductVariantFromDB = async (slug: string) => {
-  const variant = await ProductVariant.findOne({ slug }).lean();
-  if (!variant) {
-    throw new AppError(status.NOT_FOUND, 'Product Variant not found');
-  }
-  return variant;
-};
+//   const result = await ProductVariant.insertMany(payload);
 
-const createProductVariantIntoDB = async (payload: TProductVariant) => {
-  const isExist = await ProductVariant.findOne({ name: payload.name });
+//   return result;
+// };
 
-  if (isExist) {
-    throw new AppError(
-      status.BAD_REQUEST,
-      'The product variant already exists',
-    );
-  }
+// // const allVariantFromDB = async (query: Record<string, unknown>) => {
+// //   return await ProductVariant.find();
+// // };
 
-  const createdVariant = await ProductVariant.create(payload);
-  return createdVariant.toObject();
-};
+// const getVariantByNameFromDB = async (name: string) => {
+//   const variant = await ProductVariant.findOne({
+//     name: name.toLowerCase().trim(),
+//   });
+//   if (!variant) throw new AppError(status.NOT_FOUND, 'Variant not found');
+//   return variant;
+// };
 
-const updateSingleProductVariantIntoDB = async (
-  slug: string,
-  payload: Partial<TProductVariant>,
-): Promise<TProductVariant | null> => {
-  const existingVariant = await ProductVariant.findOne({ slug });
+// // const updateVariantIntoDB = async (
+// //   name: string,
+// //   payload: Partial<IProductVariant>,
+// // ) => {};
 
-  if (!existingVariant) {
-    throw new AppError(status.NOT_FOUND, 'Product Variant not found');
-  }
+// const deleteVariantFromDB = async (name: string) => {
+//   const deleted = await ProductVariant.findOneAndDelete({
+//     name: name.toLowerCase().trim(),
+//   });
+//   if (!deleted) throw new AppError(status.NOT_FOUND, 'Variant not found');
+//   return deleted;
+// };
 
-  const updateQuery: Record<string, any> = {};
-
-  if (payload.name?.trim()) {
-    updateQuery.name = payload.name.trim().toLowerCase();
-  }
-
-  if (Array.isArray(payload.attributes)) {
-    const cleanedAttributes = payload.attributes
-      .map((attr) => attr?.value?.trim().toLowerCase())
-      .filter(Boolean)
-      .map((value) => ({ value }));
-
-    updateQuery.attributes = cleanedAttributes;
-  }
-
-  const updatedVariant = await ProductVariant.findOneAndUpdate(
-    { slug },
-    updateQuery,
-    {
-      new: true,
-      runValidators: true,
-    },
-  );
-
-  return updatedVariant?.toObject?.() ?? updatedVariant;
-};
-
-const deleteSingleProductVariantFromDB = async (id: string) => {
-  const variant = await ProductVariant.findById(id);
-  if (!variant) {
-    throw new AppError(status.NOT_FOUND, 'Product Variant not found');
-  }
-
-  const deleted = await ProductVariant.findByIdAndDelete(id);
-  return deleted?.toObject?.() ?? deleted;
-};
-
-export const ProductVariantService = {
-  allProductVariantFromDB,
-  singleProductVariantFromDB,
-  createProductVariantIntoDB,
-  updateSingleProductVariantIntoDB,
-  deleteSingleProductVariantFromDB,
-};
+// export const variantService = {
+//   createVariantIntoDB,
+//   allVariantFromDB,
+//   getVariantByNameFromDB,
+//   // updateVariantIntoDB,
+//   deleteVariantFromDB,
+// };

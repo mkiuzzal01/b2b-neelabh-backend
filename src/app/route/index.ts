@@ -3,7 +3,7 @@ import { userRoute } from '../modules/user/user.route';
 import { stakeholderRoute } from '../modules/stake-holder/stakeholder.route';
 import { sellerRoute } from '../modules/seller/seller.route';
 import { categoryRoute } from '../modules/category/category.route';
-import { productVariantRoute } from '../modules/product-variant/product-variant.route';
+// import { productVariantRoute } from '../modules/product-variant/product-variant.route';
 import { ProductRoute } from '../modules/product/product.route';
 import { noticeRouter } from '../modules/notice/notice.route';
 import {
@@ -11,7 +11,7 @@ import {
   requisitionRouter,
 } from '../modules/requisition-feedback/requisition.route';
 import { authRouter } from '../modules/auth/auth.route';
-import { orderRoute } from '../modules/order/order.route';
+// import { orderRoute } from '../modules/order/order.route';
 import { galleryRouter } from '../modules/gallery/gallery.route';
 
 const router = Router();
@@ -33,10 +33,10 @@ const routeModule = [
     path: '/category',
     route: categoryRoute,
   },
-  {
-    path: '/product-variant',
-    route: productVariantRoute,
-  },
+  // {
+  //   path: '/product-variant',
+  //   route: productVariantRoute,
+  // },
   {
     path: '/product',
     route: ProductRoute,
@@ -57,10 +57,10 @@ const routeModule = [
     path: '/auth',
     route: authRouter,
   },
-  {
-    path: '/order',
-    route: orderRoute,
-  },
+  // {
+  //   path: '/order',
+  //   route: orderRoute,
+  // },
   {
     path: '/gallery',
     route: galleryRouter,

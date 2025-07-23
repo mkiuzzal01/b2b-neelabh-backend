@@ -12,32 +12,48 @@ import { ProductVariant } from '../product-variant/product-variant.model';
 import QueryBuilder from '../../builder/QueryBuilder';
 import { productSearchableField } from './product.constant';
 
-export const createProductIntoBD = async (
-  payload: TProduct,
-  creatorId: string,
-) => {
+const createProductIntoBD = async (payload: TProduct, creatorId: string) => {
   const session = await mongoose.startSession();
 
   try {
     return await session.withTransaction(async () => {
-      const { productCode, categories, variants } = payload;
+      const { productCode, categories, variants, totalQuantity } = payload;
 
-      const [existingProduct, mainCat, cat, subCat] = await Promise.all([
-        Product.findOne({ productCode }).session(session),
+      // Validate required fields
+      if (!variants || variants.length === 0) {
+        throw new AppError(
+          status.BAD_REQUEST,
+          'At least one variant is required',
+        );
+      }
+
+      // Check if product code exists
+      const existingProduct = await Product.findOne({ productCode }).session(
+        session,
+      );
+      if (existingProduct) {
+        throw new AppError(status.CONFLICT, 'Product code already exists');
+      }
+
+      // Validate categories
+      const [mainCat, cat, subCat] = await Promise.all([
         MainCategory.findById(categories.mainCategory).session(session),
         Category.findById(categories.category).session(session),
         SubCategory.findById(categories.subCategory).session(session),
       ]);
 
-      if (existingProduct)
-        throw new AppError(status.CONFLICT, 'Product code already exists');
-      if (!mainCat)
+      if (!mainCat) {
         throw new AppError(status.NOT_FOUND, 'Main category not found');
-      if (!cat) throw new AppError(status.NOT_FOUND, 'Category not found');
-      if (!subCat)
+      }
+      if (!cat) {
+        throw new AppError(status.NOT_FOUND, 'Category not found');
+      }
+      if (!subCat) {
         throw new AppError(status.NOT_FOUND, 'Sub-category not found');
+      }
 
-      const totalQuantity = variants.reduce((sum, variant) => {
+      // Calculate sum of all variant quantities
+      const calculatedTotalQuantity = variants.reduce((sum, variant) => {
         return (
           sum +
           variant.attributes.reduce((acc, attr) => {
@@ -53,6 +69,18 @@ export const createProductIntoBD = async (
         );
       }, 0);
 
+      // Validate total quantity matches sum of variants
+      if (
+        totalQuantity !== undefined &&
+        totalQuantity !== calculatedTotalQuantity
+      ) {
+        throw new AppError(
+          status.BAD_REQUEST,
+          `Total quantity (${totalQuantity}) does not match sum of variant quantities (${calculatedTotalQuantity})`,
+        );
+      }
+
+      // Update or create product variants
       const bulkVariantOps = variants.map((variant) => ({
         updateOne: {
           filter: { name: variant.name.toLowerCase() },
@@ -74,9 +102,10 @@ export const createProductIntoBD = async (
         await ProductVariant.bulkWrite(bulkVariantOps, { session });
       }
 
+      // Create the product with calculated total quantity
       const product = new Product({
         ...payload,
-        totalQuantity,
+        totalQuantity: calculatedTotalQuantity, // Use calculated value
         creatorId: new mongoose.Types.ObjectId(creatorId),
       });
 
@@ -90,56 +119,105 @@ export const createProductIntoBD = async (
 };
 
 const updateProductIntoBD = async (id: string, payload: Partial<TProduct>) => {
-  const isExitsProduct = await Product.findById({ _id: id });
+  const session = await mongoose.startSession();
 
-  if (!isExitsProduct) {
-    throw new AppError(status.CONFLICT, 'The product not found');
+  try {
+    return await session.withTransaction(async () => {
+      const existingProduct = await Product.findById(id).session(session);
+      if (!existingProduct) {
+        throw new AppError(status.NOT_FOUND, 'Product not found');
+      }
+
+      // Validate categories if they're being updated
+      if (payload.categories) {
+        const [mainCat, cat, subCat] = await Promise.all([
+          MainCategory.findById(payload.categories.mainCategory).session(
+            session,
+          ),
+          Category.findById(payload.categories.category).session(session),
+          SubCategory.findById(payload.categories.subCategory).session(session),
+        ]);
+
+        if (!mainCat) {
+          throw new AppError(status.NOT_FOUND, 'Main category not found');
+        }
+        if (!cat) {
+          throw new AppError(status.NOT_FOUND, 'Category not found');
+        }
+        if (!subCat) {
+          throw new AppError(status.NOT_FOUND, 'Sub-category not found');
+        }
+      }
+
+      // Validate variants and quantities if they're being updated
+      if (payload.variants) {
+        const calculatedTotalQuantity = payload.variants.reduce(
+          (sum, variant) => {
+            return (
+              sum +
+              variant.attributes.reduce((acc, attr) => {
+                const qty = Number(attr.quantity);
+                if (isNaN(qty) || qty < 0) {
+                  throw new AppError(
+                    status.BAD_REQUEST,
+                    `Invalid quantity "${attr.quantity}" in variant "${variant.name}"`,
+                  );
+                }
+                return acc + qty;
+              }, 0)
+            );
+          },
+          0,
+        );
+
+        // If totalQuantity is provided, validate it matches the sum
+        if (
+          payload.totalQuantity !== undefined &&
+          payload.totalQuantity !== calculatedTotalQuantity
+        ) {
+          throw new AppError(
+            status.BAD_REQUEST,
+            `Total quantity (${payload.totalQuantity}) does not match sum of variant quantities (${calculatedTotalQuantity})`,
+          );
+        }
+
+        // Update the totalQuantity in payload to ensure consistency
+        payload.totalQuantity = calculatedTotalQuantity;
+
+        // Update product variants
+        const bulkVariantOps = payload.variants.map((variant) => ({
+          updateOne: {
+            filter: { name: variant.name.toLowerCase() },
+            update: {
+              $setOnInsert: { name: variant.name.toLowerCase() },
+              $addToSet: {
+                attributes: {
+                  $each: variant.attributes.map((a) => ({
+                    value: a.value.toLowerCase(),
+                  })),
+                },
+              },
+            },
+            upsert: true,
+          },
+        }));
+
+        if (bulkVariantOps.length > 0) {
+          await ProductVariant.bulkWrite(bulkVariantOps, { session });
+        }
+      }
+
+      const updatedProduct = await Product.findByIdAndUpdate(id, payload, {
+        new: true,
+        runValidators: true,
+        session,
+      });
+
+      return updatedProduct;
+    });
+  } finally {
+    session.endSession();
   }
-
-  const isExistMainCategory = await MainCategory.findById({
-    _id: payload.categories?.mainCategory,
-  });
-
-  if (!isExistMainCategory) {
-    throw new AppError(status.NOT_FOUND, 'The main category not found');
-  }
-
-  const isExistCategory = await Category.findById({
-    _id: payload.categories?.category,
-  });
-  if (!isExistCategory) {
-    throw new AppError(status.NOT_FOUND, 'The category not found');
-  }
-
-  const isExitsSubCategory = await SubCategory.findById({
-    _id: payload.categories?.subCategory,
-  });
-
-  if (!isExitsSubCategory) {
-    throw new AppError(status.NOT_FOUND, 'The sub category not found');
-  }
-
-  if (payload.variants && payload.totalQuantity) {
-    const sumOfVariants = payload.variants.reduce(
-      (sum, v) =>
-        sum + v.attributes.reduce((s2, attr) => s2 + (attr.quantity ?? 0), 0),
-      0,
-    );
-
-    if (sumOfVariants !== payload.totalQuantity) {
-      throw new AppError(
-        status.BAD_REQUEST,
-        'The product variant and quantities not equal',
-      );
-    }
-  }
-
-  const result = await Product.findByIdAndUpdate({ _id: id }, payload, {
-    new: true,
-    runValidators: true,
-  });
-
-  return result;
 };
 
 const allProductFromBD = async (query: Record<string, unknown>) => {

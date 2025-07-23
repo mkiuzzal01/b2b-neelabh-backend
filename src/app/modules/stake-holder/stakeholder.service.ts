@@ -62,8 +62,8 @@ const updateStakeholderIntoDB = async (
     updateFields['address.presentAddress'] = payload.address.presentAddress;
   }
 
-  if (payload.profileImageUrl) {
-    updateFields['profileImageUrl'] = payload.profileImageUrl;
+  if (payload.profileImage) {
+    updateFields['profileImageUrl'] = payload.profileImage;
   }
 
   const result = await Stakeholder.findByIdAndUpdate(id, updateFields, {
