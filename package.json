@@ -1,11 +1,9 @@
 {
   "name": "health-track-backend",
   "version": "1.0.0",
-  "description": "",
+  "description": "A e-commerce web application server.",
+  "repository": "https://github.com/mkiuzzal01/b2b-neelabh-backend",
   "main": "server.js",
-  "engines": {
-    "node": "14"
-  },
   "scripts": {
     "build": "tsc",
     "dev": "ts-node-dev --respawn --transpile-only ./src/server.ts",
@@ -18,7 +16,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "",
+  "author": "mki_uzzal",
   "license": "ISC",
   "dependencies": {
     "@types/bcrypt": "^5.0.2",
