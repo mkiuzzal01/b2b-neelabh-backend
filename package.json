@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "A e-commerce web application server.",
   "repository": "https://github.com/mkiuzzal01/b2b-neelabh-backend",
-  "main": "server.js",
+  "main": "dist/server.js",
   "engines": {
     "node": "18.x",
     "yarn": "1.22.x"
