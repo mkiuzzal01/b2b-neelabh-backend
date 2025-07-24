@@ -1,35 +1,45 @@
-import express, { Request, Response } from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import router from './app/route';
 import globalErrorHandler from './app/middlewares/globalErrorHandler';
 import notFound from './app/utils/NotFound';
-import config from './app/config';
 
 const app = express();
+
+// Middleware
 app.use(express.json());
-app.use(cors({ origin: config.cors_origins, credentials: true }));
 app.use(express.text());
 app.use(cookieParser());
+app.use(
+  cors({
+    origin: 'http://localhost:5173',
+    credentials: true,
+  }),
+);
 
-// All application routes:
+// Routes
 app.use('/api/v1/', router);
 
-// Home route:
+// Root route
 app.get('/', (req: Request, res: Response) => {
   res.send({ success: true, message: 'Welcome to neelabh b2b!' });
 });
 
-// Test route:
-app.get('/test', (req: Request, res: Response) => {
-  Promise.reject();
-  res.send(req);
+// Test route for error handling
+app.get('/test', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    // Simulate async error
+    throw new Error('Test error triggered');
+  } catch (err) {
+    next(err);
+  }
 });
 
-//global error handler:
+// Global error handler
 app.use(globalErrorHandler);
 
-//not found error handler:
+// 404 Not found handler
 app.use(notFound);
 
 export default app;
