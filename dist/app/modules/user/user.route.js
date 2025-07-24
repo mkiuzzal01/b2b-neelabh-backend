@@ -1,0 +1,24 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.userRoute = void 0;
+const express_1 = require("express");
+const user_controller_1 = require("./user.controller");
+const validationRequest_1 = __importDefault(require("../../middlewares/validationRequest"));
+const stakeholder_validation_1 = require("../stake-holder/stakeholder.validation");
+const seller_validation_1 = require("../seller/seller.validation");
+const auth_1 = require("../../middlewares/auth");
+const AccessRole_1 = require("../../interface/AccessRole");
+const user_validation_1 = require("./user.validation");
+const route = (0, express_1.Router)();
+route.post('/create-stakeholder', (0, auth_1.auth)(AccessRole_1.ACCESS_ROLE.SUPER_ADMIN), (0, validationRequest_1.default)(stakeholder_validation_1.stakeholderValidation.createStakeholderValidation), user_controller_1.userController.createStackHolder);
+route.post('/create-seller', (0, auth_1.auth)(AccessRole_1.ACCESS_ROLE.SUPER_ADMIN, AccessRole_1.ACCESS_ROLE.ADMIN), (0, validationRequest_1.default)(seller_validation_1.sellerValidation.createSellerValidation), user_controller_1.userController.createSeller);
+route.patch('/update-user/:id', (0, auth_1.auth)(AccessRole_1.ACCESS_ROLE.SUPER_ADMIN), (0, validationRequest_1.default)(user_validation_1.userValidation.updateUserValidationSchema), user_controller_1.userController.updatedUser);
+route.get('/all-user', (0, auth_1.auth)(AccessRole_1.ACCESS_ROLE.SUPER_ADMIN, AccessRole_1.ACCESS_ROLE.ADMIN), user_controller_1.userController.allUsers);
+route.get('/single-user-with-id/:id', (0, auth_1.auth)(AccessRole_1.ACCESS_ROLE.SUPER_ADMIN, AccessRole_1.ACCESS_ROLE.ADMIN, AccessRole_1.ACCESS_ROLE.ACCOUNTANT, AccessRole_1.ACCESS_ROLE.PRODUCT_MANAGER, AccessRole_1.ACCESS_ROLE.SELLER), user_controller_1.userController.singleUserById);
+route.get('/single-user-with-slug/:slug', (0, auth_1.auth)(AccessRole_1.ACCESS_ROLE.SUPER_ADMIN, AccessRole_1.ACCESS_ROLE.ADMIN, AccessRole_1.ACCESS_ROLE.ACCOUNTANT, AccessRole_1.ACCESS_ROLE.PRODUCT_MANAGER, AccessRole_1.ACCESS_ROLE.SELLER), user_controller_1.userController.singleUserBySlug);
+route.get('/admin-dashboard-overview', (0, auth_1.auth)(AccessRole_1.ACCESS_ROLE.SUPER_ADMIN, AccessRole_1.ACCESS_ROLE.ADMIN), user_controller_1.userController.adminDashboardOverview);
+route.get('/seller-dashboard-overview', (0, auth_1.auth)(AccessRole_1.ACCESS_ROLE.SELLER), user_controller_1.userController.sellerDashboardOverview);
+exports.userRoute = route;
