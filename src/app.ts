@@ -1,4 +1,4 @@
-import express, { Request, Response, NextFunction } from 'express';
+import express, { Request, Response } from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import router from './app/route';
@@ -27,19 +27,14 @@ app.get('/', (req: Request, res: Response) => {
 });
 
 // Test route for error handling
-app.get('/test', async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    // Simulate async error
-    throw new Error('Test error triggered');
-  } catch (err) {
-    next(err);
-  }
+app.get('/test', (req: Request, res: Response) => {
+  throw new Error('Testing error handling');
 });
+
+// Not found route
+app.use(notFound);
 
 // Global error handler
 app.use(globalErrorHandler);
-
-// 404 Not found handler
-app.use(notFound);
 
 export default app;
