@@ -2,7 +2,7 @@
   "name": "neelabh-b2b-backend",
   "version": "1.0.0",
   "description": "A e-commerce web application server.",
-  "main": "src/server.ts",
+  "main": "index.js",
   "scripts": {
     "build": "tsc",
     "dev": "ts-node-dev --respawn --transpile-only ./src/server.ts",
