@@ -13,6 +13,7 @@ app.use(
   cors({
     origin: ['http://localhost:5173', 'https://b2b-neelabh.netlify.app'],
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   }),
 );
 app.use(express.json());
