@@ -8,12 +8,13 @@ import notFound from './app/utils/NotFound';
 
 const app = express();
 
+//allow origin:
+const origins = ['http://localhost:5173', 'https://b2b-neelabh.netlify.app'];
 // Middleware
 app.use(
   cors({
-    origin: ['http://localhost:5173', 'https://b2b-neelabh.netlify.app'],
+    origin: origins,
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   }),
 );
 app.use(express.json());
